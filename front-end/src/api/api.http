@@ -1,0 +1,33 @@
+###
+GET https://g4djq4bh-3000.asse.devtunnels.ms/
+Accept: application/json
+Cookie: cookie: {{cookie}}
+
+
+###
+GET {{baseUrl}}/node/kpi/v1/dailyStatsRegion?tech=nr
+Accept: application/json
+Cookie: cookie: {{cookie}}
+
+###
+GET {{baseUrl}}/node/kpi/v1/dailyStatsRegion
+Accept: application/json
+Cookie: cookie: {{cookie}}
+
+###
+GET http://localhost:3232/proxy/node/ctr/ctr-dl
+Accept: application/json
+Cookie: cookie: {{cookie}}
+
+
+###
+GET http://localhost:3232/
+Accept: application/json
+
+
+###
+GET http://localhost:3232/proxy/node/kpi/v1/dailyStatsRegion?tech=nr
+Accept: application/json
+
+###
+GET https://api.eprojecttrackers.com/node/dnbSocket/resetCodeTunnel

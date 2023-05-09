@@ -8,7 +8,14 @@ export const useMainStore = defineStore({
             nr: {},
             lte: {},
         }),
+
+        hourlyStatsRegion: useLocalStorage('hourlyStatsRegion', {
+            nr: {},
+            lte: {},
+        }),
+
         regionsArray: [
+            'ALL',
             'CENTRAL',
             'EASTERN',
             'NORTHERN',
@@ -16,6 +23,7 @@ export const useMainStore = defineStore({
             'SABAH',
             'SARAWAK',
         ],
+
         regions: [
             {
                 label: 'CENTRAL',
@@ -46,11 +54,16 @@ export const useMainStore = defineStore({
                 value: null
             },
         ],
-        selectedRegion: useLocalStorage('selectedRegion', 'CENTRAL')
+
+        selectedRegion: useLocalStorage('selectedRegion', 'ALL'),
+        darkMode: useLocalStorage('darkMode', true),
     }),
     actions: {
         saveDailyStatsRegion(data, tech) {
             this.dailyStatsRegion[tech] = data;
+        },
+        saveHourlyStatsRegion(data, tech) {
+            this.hourlyStatsRegion[tech] = data;
         }
     },
     getters: {

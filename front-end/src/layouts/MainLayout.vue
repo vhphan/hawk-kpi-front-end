@@ -1,6 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import {sidebarItems} from "@/router/sidebarItems.js";
+import {useQuasar} from "quasar";
+import {useMainStore} from "@/store/mainStore.js";
+import {storeToRefs} from "pinia";
 
 const drawer = ref(false);
 const miniState = ref(false);
@@ -16,6 +19,14 @@ const drawerClick = function (e) {
         e.stopPropagation();
     }
 };
+
+const $q = useQuasar();
+const mainStore = useMainStore();
+const {darkMode} = storeToRefs(mainStore);
+watch(darkMode, (value) => {
+    $q.dark.set(value);
+}, {immediate: true});
+
 </script>
 
 
@@ -26,6 +37,11 @@ const drawerClick = function (e) {
                 <q-toolbar>
                     <q-btn flat @click="drawer = !drawer" round dense icon="menu"/>
                     <q-toolbar-title>Header</q-toolbar-title>
+                    <q-space/>
+                    <q-toggle
+                        v-model="darkMode" label="Dark Mode" dense
+                        color="warning"
+                    />
                 </q-toolbar>
             </q-header>
 

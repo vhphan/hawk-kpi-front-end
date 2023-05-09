@@ -1,13 +1,8 @@
-<template>
-  <div>Page2</div>
-</template>
+<script setup>
 
-<script>
-export default {
-  name: "Page2"
-};
+import RegionStats from "@/pages/subPages/RegionStats.vue";
 </script>
 
-<style scoped>
-
-</style>
+<template>
+    <region-stats time-unit="hourly" />
+</template>

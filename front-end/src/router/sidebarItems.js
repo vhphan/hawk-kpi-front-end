@@ -4,13 +4,13 @@ export const sidebarItems = [
     {
         to: `${basePath}page1`,
         icon: "inbox",
-        label: "Page 1",
+        label: "Daily",
         id: 1,
     },
     {
         to: `${basePath}page2`,
         icon: "send",
-        label: "Page 2",
+        label: "Hourly",
         id: 2,
     }
 ];

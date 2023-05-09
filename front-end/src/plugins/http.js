@@ -18,7 +18,8 @@ class MyFetch {
 
             onFetchError(ctx) {
                 // ctx.data can be null when 5xx response
-                console.error(ctx);
+                console.log(ctx.error);
+                console.log(ctx.response.url)
                 return ctx;
             },
 
@@ -67,11 +68,19 @@ class MyFetch {
 
     }
 
-    get(url, params = {}) {
-
+    // static method to generate url with query params
+    static generateUrl(url, params = {}) {
         const query = new URLSearchParams(params).toString();
+        return url + '?' + query;
+    }
 
-        let fetcher = this.myUseFetch(url + '?' + query);
+
+    get(url) {
+
+        // const query = new URLSearchParams(params).toString();
+        // let fetcher = this.myUseFetch(url + '?' + query);
+
+        let fetcher = this.myUseFetch(url);
 
         const {
             statusCode,

@@ -6,8 +6,9 @@ export const checkApi = () => {
 
 export const apiRoutes = {
     dailyStatsRegion: '/dailyStatsRegion',
+    hourlyStatsRegion: '/hourlyStatsRegion',
 }
 
-export const apiGet = (routeName, params={}) => {
-    return api().get(routeName, params);
+export const apiGet = (urlRef) => {
+    return api().get(urlRef);
 }

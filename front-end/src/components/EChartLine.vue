@@ -51,6 +51,14 @@ const props = defineProps({
         type: String,
         default: 'dark',
     },
+    region: {
+        type: String,
+        default: '',
+    },
+    cellName: {
+        type: String,
+        default: '',
+    },
 
 });
 
@@ -151,6 +159,14 @@ watch(chartRef, (newVal) => {
     connect(props.timeUnit);
 }, {immediate: true});
 
+// method to set data
+const refresh = () => {
+    chartRef.value.setOption(getOption(props.kpiColumn, props.data, props.seriesName));
+};
+
+watch(() => props.data, () => {
+    refresh();
+}, {deep: true});
 
 </script>
 

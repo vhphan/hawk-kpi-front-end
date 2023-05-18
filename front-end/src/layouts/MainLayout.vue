@@ -1,11 +1,14 @@
 <script setup>
-import {ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {sidebarItems} from "@/router/sidebarItems.js";
 import {useQuasar} from "quasar";
 import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
+import {useRoute} from "vue-router";
+import Settings from "@/components/Settings.vue";
 
 const drawer = ref(false);
+
 const miniState = ref(false);
 const drawerClick = function (e) {
     // if in "mini" state and user
@@ -27,20 +30,62 @@ watch(darkMode, (value) => {
     $q.dark.set(value);
 }, {immediate: true});
 
+// get current route and store as ref currentRoute
+const route = useRoute();
+const routeName = computed(() => route.name);
+
+const footerVisible = ref(false);
+
+// set footerVisible to true intermittently for 1 seconds after idle time of 1 seconds and then repeat
+//  check if production using VITE Env
+
+const idleTime = import.meta.env.PROD ? 120_000 : 10_000;
+const intermittentTime = 3000;
+const idleTimer = ref(null);
+const intermittentTimer = ref(null);
+
+const resetTimers = () => {
+    clearTimeout(idleTimer.value);
+    clearTimeout(intermittentTimer.value);
+    idleTimer.value = setTimeout(() => {
+        footerVisible.value = true;
+        intermittentTimer.value = setTimeout(() => {
+            footerVisible.value = false;
+            resetTimers();
+        }, intermittentTime);
+    }, idleTime);
+};
+
+onMounted(() => {
+    footerVisible.value = true;
+    setTimeout(() => {
+        footerVisible.value = false;
+        resetTimers();
+    }, 10_000);
+});
+
+const rightDrawerOpen = ref(false);
+const toggleRightDrawer = function () {
+    rightDrawerOpen.value = !rightDrawerOpen.value;
+};
+
 </script>
 
 
 <template>
     <div class="q-pa-md">
-        <q-layout view="hHh Lpr lff">
+        <q-layout view="hHh Lpr fFf">
             <q-header elevated>
                 <q-toolbar>
                     <q-btn flat @click="drawer = !drawer" round dense icon="menu"/>
-                    <q-toolbar-title>Header</q-toolbar-title>
+                    <q-toolbar-title>HAWK KPI Dashboard</q-toolbar-title>
                     <q-space/>
                     <q-toggle
-                        v-model="darkMode" label="Dark Mode" dense
-                        color="warning"
+                            v-model="darkMode" label="Dark Mode" dense
+                            color="warning"
+                    />
+                    <q-btn flat round dense icon="settings" @click="toggleRightDrawer"
+                           class="q-ml-md"
                     />
                 </q-toolbar>
             </q-header>
@@ -67,22 +112,20 @@ watch(darkMode, (value) => {
                     <!--                    >-->
                     <!--                        <q-route-tab :to="`${basePath}page1`" label="Page One" icon="inbox"/>-->
                     <!--                        <q-route-tab :to="`${basePath}page2`" label="Page Two" icon="star"/>-->
-
-
                     <!--                    </q-tabs>-->
 
                     <q-list padding
                     >
                         <q-item
-                            v-for="item in sidebarItems"
-                            clickable v-ripple :to=item.to class="text-white">
+                                v-for="item in sidebarItems"
+                                clickable v-ripple :to=item.to class="text-white">
 
                             <q-item-section avatar>
                                 <q-icon :name="item.icon"/>
                             </q-item-section>
 
-                            <q-item-section>
-                                {{item.label}}
+                            <q-item-section :class="{active: item.routeName===routeName}">
+                                {{ item.label }}
                             </q-item-section>
                         </q-item>
 
@@ -107,11 +150,25 @@ watch(darkMode, (value) => {
                 </div>
             </q-drawer>
 
+            <q-drawer v-model="rightDrawerOpen" side="right" overlay bordered>
+                <!--                <div>Coming Soon... Work in Progress</div>-->
+                <settings/>
+            </q-drawer>
+
             <q-page-container>
                 <q-page class="q-px-lg q-py-md">
                     <router-view/>
                 </q-page>
             </q-page-container>
+            <q-slide-transition>
+                <q-footer elevated class="bg-primary text-white" v-if="footerVisible" style="border: white 2px solid">
+                    <q-toolbar>
+                        <q-toolbar-title>
+                            <span class="q-mx-md">DEMO VERSION: </span><span style="font-size: 15px;">&copy; 2023 vee.huen.phan@ericsson.com </span>
+                        </q-toolbar-title>
+                    </q-toolbar>
+                </q-footer>
+            </q-slide-transition>
         </q-layout>
     </div>
 </template>
@@ -120,12 +177,24 @@ watch(darkMode, (value) => {
 .q-mini-drawer-hide {
     transition: all .3s ease-in-out;
 }
-.q-drawer--standard  {
+
+.q-drawer--standard {
     transition: all 1s ease-in-out;
 }
 
 .q-drawer--mini {
     transition: all 1s ease-in-out;
+}
+
+.active {
+    /*    double underline the text*/
+    text-decoration: underline;
+    text-decoration-style: double;
+    text-decoration-color: #37ffd4;
+    /*    make text bold */
+    font-weight: bold;
+    /*    make font bigger */
+    font-size: 1.5em;
 }
 
 </style>

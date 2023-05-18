@@ -96,7 +96,7 @@ export const useMainStore = defineStore({
             'Celcom': '#37ffd4',
             'Digi': '#eeff03',
             'UMobile': '#ffa600',
-            'YTL': 'rgba(103,66,70,0.85)',
+            'YTL': '#795E61',
             'TM': '#ff00ff',
         })
 

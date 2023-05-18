@@ -186,7 +186,7 @@ const refresh = () => {
     chartRef.value.setOption(getOption(props.kpiColumn, props.data, props.seriesName));
 };
 
-watch(() => props.data, () => {
+watch([() => props.data, ()=>props.colorMapping], () => {
     refresh();
 }, {
     deep: true,

@@ -522,3 +522,8 @@ export const getTodayDateString = function () {
 export const convertDateStringToEpoch = function (dateString) {
     return new Date(dateString).getTime() / 1000;
 }
+
+export const generateUrl = function (url, params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return url + '?' + query;
+};

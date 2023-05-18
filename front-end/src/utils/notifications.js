@@ -11,13 +11,15 @@ export const triggerPositive = function (opts = {}) {
 }
 
 export const triggerNegative = function (opts = {}) {
+    console.log(opts.message);
+
     Notify.create({
         ...{
             type: 'negative',
             message: 'This is a "negative" type notification.',
             position: 'center'
         }, ...opts
-    })
+    });
 }
 
 export const triggerWarning = function (opts = {}) {

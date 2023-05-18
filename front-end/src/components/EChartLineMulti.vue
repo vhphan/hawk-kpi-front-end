@@ -10,18 +10,13 @@ import {
     ToolboxComponent,
     TooltipComponent,
 } from "echarts/components";
-import 'echarts/theme/jazz';
-import 'echarts/theme/red';
-import 'echarts/theme/cool';
-import "echarts/theme/dark-digerati";
-import "echarts/theme/helianthus";
 import "echarts/theme/dark";
-
 import VChart from "vue-echarts";
 import {computed, defineComponent, onBeforeUnmount, ref, watch, watchEffect} from "vue";
 import {storeToRefs} from "pinia";
 import {useMainStore} from "@/store/mainStore.js";
-import {utcToZonedTime, format} from 'date-fns-tz';
+import { utcToZonedTime, format } from 'date-fns-tz';
+
 
 const timeZone = 'Asia/Singapore';
 
@@ -30,14 +25,16 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    colorMapping: {
+        type: Object,
+        default: () => {
+        }
+    },
     kpiColumn: {
         type: String,
         required: true,
     },
-    seriesName: {
-        type: String,
-        default: '',
-    },
+
     addOption: {
         type: Object,
         default: () => {
@@ -66,18 +63,7 @@ const props = defineProps({
 
 });
 
-
-const getOption = function (kpiColumn, dataArray, seriesName = '') {
-    const getSeries = () => {
-        if (!dataArray || !dataArray.map) {
-            return [];
-        }
-        return [{
-            data: dataArray.map(item => [utcToZonedTime(item[0], timeZone), item[1]]),
-            type: 'line',
-            name: seriesName,
-        }];
-    };
+const getOption = function (kpiColumn, seriesArray, seriesName = '') {
     return {
         renderer: 'canvas',
         legend: {
@@ -90,7 +76,7 @@ const getOption = function (kpiColumn, dataArray, seriesName = '') {
                 10, // left
             ],
             // selected: legendSelected.value || {},
-            show: false,
+            show: true,
         },
         dataZoom: [
             {
@@ -150,13 +136,30 @@ const getOption = function (kpiColumn, dataArray, seriesName = '') {
                 }
             },
         },
-        series: getSeries()
-        ,
+
+        series: seriesArray.map(series=>{
+            if (!series.data || !series.data.map) return {};
+            const seriesObj = {
+                data: series.data.map(item => [utcToZonedTime(item[0], timeZone) ,item[1]]),
+                type: 'line',
+                name: series.name,
+            };
+            if (props.colorMapping[series.name]) {
+                return {
+                    ...seriesObj,
+                    itemStyle: {
+                        color: props.colorMapping[series.name],
+                    },
+                }
+            }
+            return seriesObj
+        }),
+
         ...props.addOption,
     };
 };
 
-const chartOption = getOption(props.kpiColumn, props.data, props.seriesName);
+const chartOption = getOption(props.kpiColumn, props.data);
 
 use([
     CanvasRenderer,
@@ -208,6 +211,7 @@ const computedTheme = computed(() => {
             :autoresize="true"
             style="height: 300px;"
             :group="timeUnit"
+
     />
 </template>
 

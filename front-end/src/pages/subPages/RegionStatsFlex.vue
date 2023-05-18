@@ -1,4 +1,5 @@
 <script setup>
+
 import {useApiArray} from "@/composables/api.js";
 import {useQuasar} from 'quasar';
 import {apiGet, apiRoutes} from "@/api/apiCalls.js";
@@ -8,6 +9,7 @@ import {storeToRefs} from "pinia";
 import {triggerNegative} from "@/utils/notifications.js";
 import EChartLine from "@/components/EChartLine.vue";
 import {generateUrl} from "@/utils/myFunctions.js";
+import EChartLineMulti from "@/components/EChartLineMulti.vue";
 
 const props = defineProps({
     timeUnit: {
@@ -19,26 +21,17 @@ const props = defineProps({
     },
 });
 
-// const {data, execute, isFetching} = apiGet(apiRoutes.dailyStatsRegion, {
-//     tech: 'nr'
-// });
 const mainStore = useMainStore();
-
 const tab = ref('nr');
-
 const {
     selectedRegion,
-    kpiColumns
+    kpiColumnsFlex
 } = storeToRefs(mainStore);
-
-const apiRoute = props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegion : apiRoutes.hourlyStatsRegion;
-
+const apiRoute = props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
 const urlRef = computed(() => {
     return generateUrl(apiRoute, {tech: tab.value, region: selectedRegion.value});
 });
-
 const apiArray = [apiGet(urlRef)];
-
 const {
     isFetchingArray,
     errorArray,
@@ -49,24 +42,21 @@ const {
     const index = 0;
     if (dataArray.length >= index + 1 && dataArray.at(index).value && dataArray.at(index).value.data) {
         if (props.timeUnit === 'daily') {
-            mainStore.dailyStatsRegion[tab.value] = dataArray.at(index).value.data;
-            mainStore.dailyStatsRegionMeta[tab.value] = dataArray.at(index).value.meta;
+            mainStore.dailyStatsRegionFlex[tab.value] = dataArray.at(index).value.data;
+            mainStore.dailyStatsRegionFlexMeta[tab.value] = dataArray.at(index).value.meta;
         }
         if (props.timeUnit === 'hourly') {
-            mainStore.hourlyStatsRegion[tab.value] = dataArray.at(index).value.data;
-            mainStore.hourlyStatsRegionMeta[tab.value] = dataArray.at(index).value.meta;
+            mainStore.hourlyStatsRegionFlex[tab.value] = dataArray.at(index).value.data;
+            mainStore.hourlyStatsRegionFlexMeta[tab.value] = dataArray.at(index).value.meta;
         }
     }
 });
-
-// const {dailyStatsRegion} = storeToRefs(mainStore);
-// const statsRegion = props.timeUnit === 'daily' ? mainStore.dailyStatsRegion : mainStore.hourlyStatsRegion;
 const getStats = function (timeUnit) {
     if (timeUnit === 'daily') {
-        return storeToRefs(mainStore).dailyStatsRegion;
+        return storeToRefs(mainStore).dailyStatsRegionFlex;
     }
     if (timeUnit === 'hourly') {
-        return storeToRefs(mainStore).hourlyStatsRegion;
+        return storeToRefs(mainStore).hourlyStatsRegionFlex;
     }
 };
 
@@ -82,6 +72,7 @@ watch(isLoading, () => {
     $q.loading.hide();
 });
 
+
 const {regionsArray} = storeToRefs(mainStore);
 
 watch([selectedRegion, tab], () => {
@@ -92,19 +83,22 @@ watch([selectedRegion, tab], () => {
 
 const getRegionMetaData = function () {
     if (props.timeUnit === 'daily') {
-        return storeToRefs(mainStore).dailyStatsRegionMeta;
+        return storeToRefs(mainStore).dailyStatsRegionFlexMeta;
     }
     if (props.timeUnit === 'hourly') {
-        return storeToRefs(mainStore).hourlyStatsRegionMeta;
+        return storeToRefs(mainStore).hourlyStatsRegionFlexMeta;
     }
 };
 
 const regionMetaData = getRegionMetaData();
 
+const {colorMapping} = storeToRefs(mainStore);
+
 </script>
 
 
 <template>
+
     <div class="row">
         <q-select
                 :options="regionsArray"
@@ -119,8 +113,6 @@ const regionMetaData = getRegionMetaData();
         </div>
     </div>
     <q-card>
-
-
         <q-tabs
                 v-model="tab"
                 dense
@@ -141,15 +133,15 @@ const regionMetaData = getRegionMetaData();
 
             <q-tab-panel name="nr">
                 <div class="row">
-                    <q-card v-for="kpiColumn in kpiColumns['nr']" :key="`${tab}-${kpiColumn}`"
+                    <q-card v-for="kpiColumn in kpiColumnsFlex['nr']" :key="`flex-${tab}-${kpiColumn}`"
                             class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
                             style="border: 1px blue solid;">
-                        <e-chart-line
-                                :data="statsRegion['nr'][kpiColumn]"
-                                :kpiColumn="kpiColumn"
-                                seriesName="nr"
-                                :time-unit="timeUnit"
-                                :region="selectedRegion"
+                        <e-chart-line-multi
+                            :data="statsRegion['nr'][kpiColumn]"
+                            :kpiColumn="kpiColumn"
+                            :time-unit="timeUnit"
+                            :region="selectedRegion"
+                            :color-mapping="colorMapping"
                         />
                     </q-card>
                 </div>
@@ -157,20 +149,22 @@ const regionMetaData = getRegionMetaData();
 
             <q-tab-panel name="lte">
                 <div v-if="timeUnit==='daily'" class="row">
-                    <q-card v-for="kpiColumn in kpiColumns['lte']" :key="`${tab}-${kpiColumn}`"
+                    <q-card v-for="kpiColumn in kpiColumnsFlex['lte']" :key="`flex-${tab}-${kpiColumn}`"
                             class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
                             style="border: 1px blue solid;">
-                        <e-chart-line
-                                :data="statsRegion['lte'][kpiColumn]"
-                                :kpiColumn="kpiColumn"
-                                seriesName="lte"
-                                :time-unit="timeUnit"
-                                :region="selectedRegion"
+                        <e-chart-line-multi
+                            :data="statsRegion['lte'][kpiColumn]"
+                            :kpiColumn="kpiColumn"
+                            :time-unit="timeUnit"
+                            :region="selectedRegion"
+                            :color-mapping="colorMapping"
                         />
+
                     </q-card>
                 </div>
-                <div v-else class="text-h6">COMING SOON</div>
-                Work In Progress.
+
+                <div v-else class="text-h6">COMING SOON... Work In Progress.</div>
+
             </q-tab-panel>
 
         </q-tab-panels>

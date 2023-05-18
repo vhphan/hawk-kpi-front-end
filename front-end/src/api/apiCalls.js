@@ -7,6 +7,8 @@ export const checkApi = () => {
 export const apiRoutes = {
     dailyStatsRegion: '/dailyStatsRegion',
     hourlyStatsRegion: '/hourlyStatsRegion',
+    dailyStatsRegionFlex: '/dailyStatsRegionFlex',
+    hourlyStatsRegionFlex: '/hourlyStatsRegionFlex',
 }
 
 export const apiGet = (urlRef) => {

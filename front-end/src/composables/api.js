@@ -16,6 +16,7 @@ export const useApiArray = (apiArray, executeCallback = null) => {
         errorArray.forEach((error) => {
             if (error.value) {
                 triggerNegative({message: error.value});
+                triggerNegative({message: 'Something went wrong.'})
             }
         });
         executeCallback && executeCallback();

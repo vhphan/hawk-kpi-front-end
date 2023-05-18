@@ -14,6 +14,39 @@ export const useMainStore = defineStore({
             lte: {},
         }),
 
+        dailyStatsRegionMeta: useLocalStorage('dailyStatsRegionMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsRegionMeta: useLocalStorage('hourlyStatsRegionMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsRegionFlex: useLocalStorage('dailyStatsRegion', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsRegionFlex: useLocalStorage('hourlyStatsRegion', {
+                nr: {},
+                lte: {},
+            }
+        ),
+
+        dailyStatsRegionFlexMeta: useLocalStorage('dailyStatsRegionMeta', {
+                nr: {},
+                lte: {},
+            }
+        ),
+
+        hourlyStatsRegionFlexMeta: useLocalStorage('hourlyStatsRegionMeta', {
+                nr: {},
+                lte: {},
+            }
+        ),
+
         regionsArray: [
             'ALL',
             'CENTRAL',
@@ -57,6 +90,16 @@ export const useMainStore = defineStore({
 
         selectedRegion: useLocalStorage('selectedRegion', 'ALL'),
         darkMode: useLocalStorage('darkMode', true),
+
+        colorMapping: useLocalStorage('colorMapping', {
+            'Maxis': '#72fa05',
+            'Celcom': '#37ffd4',
+            'Digi': '#eeff03',
+            'UMobile': '#ffa600',
+            'YTL': 'rgba(103,66,70,0.85)',
+            'TM': '#ff00ff',
+        })
+
     }),
     actions: {
         saveDailyStatsRegion(data, tech) {
@@ -74,5 +117,12 @@ export const useMainStore = defineStore({
                 lte: Object.keys(dailyStatsRegion.lte),
             };
         },
+        kpiColumnsFlex: (state) => {
+            const {dailyStatsRegionFlex} = state;
+            return {
+                nr: Object.keys(dailyStatsRegionFlex.nr),
+                lte: Object.keys(dailyStatsRegionFlex.lte),
+            };
+        }
     }
 });

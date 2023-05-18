@@ -1,1 +1,1 @@
-export const basePath = '/apps/kpi-frontend/';
+export const basePath = '/node/apps/kpi-frontend/';

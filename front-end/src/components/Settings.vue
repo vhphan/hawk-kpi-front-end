@@ -2,7 +2,12 @@
 import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
 
+
 const mainStore = useMainStore();
+
+
+// ========================================================
+// Color Mapping
 const {colorMapping} = storeToRefs(mainStore);
 const operators = [
     'Maxis',
@@ -14,6 +19,11 @@ const operators = [
 ];
 
 
+// ========================================================
+// Chart size
+const {chartSizeClass, chartSizeClassOptions} = storeToRefs(mainStore);
+
+
 </script>
 
 <template>
@@ -23,6 +33,7 @@ const operators = [
                     expand-separator
                     icon="signal_cellular_alt"
                     label="Operator Colors"
+                    default-opened
             >
                 <q-card>
                     <q-card-section>
@@ -37,7 +48,7 @@ const operators = [
                         >
                             <template v-slot:append>
                                 <span
-                                    :style="`width: 20px; height: 20px; background-color: ${colorMapping[operator]}; border-radius: 50%; display: inline-block;`"
+                                        :style="`width: 20px; height: 20px; background-color: ${colorMapping[operator]}; border-radius: 50%; display: inline-block;`"
                                 >
 
                                 </span>
@@ -54,20 +65,25 @@ const operators = [
                 </q-card>
             </q-expansion-item>
 
-<!--            <q-expansion-item-->
-<!--                    expand-separator-->
-<!--                    icon="signal_wifi_off"-->
-<!--                    label="Wifi settings"-->
-<!--            >-->
-<!--                <q-card>-->
-<!--                    <q-card-section>-->
-<!--                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos-->
-<!--                        corrupti-->
-<!--                        commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste-->
-<!--                        eveniet doloribus ullam aliquid.-->
-<!--                    </q-card-section>-->
-<!--                </q-card>-->
-<!--            </q-expansion-item>-->
+            <q-expansion-item
+                    expand-separator
+                    icon="aspect_ratio"
+                    label="Chart Size"
+            >
+                <q-card>
+                    <q-card-section>
+                        <div>Flex Chart</div>
+                        <q-select
+
+                                :options="chartSizeClassOptions"
+                                v-model="chartSizeClass"
+                                option-label="label"
+                                option-value="value"
+                                outlined
+                       />
+                    </q-card-section>
+                </q-card>
+            </q-expansion-item>
 
 
         </q-list>

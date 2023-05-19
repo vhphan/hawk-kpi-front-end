@@ -25,7 +25,8 @@ const mainStore = useMainStore();
 const tab = ref('nr');
 const {
     selectedRegion,
-    kpiColumnsFlex
+    kpiColumnsFlex,
+    kpiToExclude
 } = storeToRefs(mainStore);
 const apiRoute = props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
 const urlRef = computed(() => {
@@ -92,7 +93,10 @@ const getRegionMetaData = function () {
 
 const regionMetaData = getRegionMetaData();
 
-const {colorMapping} = storeToRefs(mainStore);
+const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
+
+
+
 
 </script>
 
@@ -133,15 +137,18 @@ const {colorMapping} = storeToRefs(mainStore);
 
             <q-tab-panel name="nr">
                 <div class="row">
-                    <q-card v-for="kpiColumn in kpiColumnsFlex['nr']" :key="`flex-${tab}-${kpiColumn}`"
-                            class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
-                            style="border: 1px blue solid;">
+                    <q-card
+                            v-for="kpiColumn in kpiColumnsFlex['nr'].filter(k=>kpiToExclude.indexOf(k)===-1)" :key="`flex-${tab}-${kpiColumn}`"
+                            :class="chartSizeClass.value"
+                            style="border: 1px blue solid;"
+                    >
                         <e-chart-line-multi
-                            :data="statsRegion['nr'][kpiColumn]"
-                            :kpiColumn="kpiColumn"
-                            :time-unit="timeUnit"
-                            :region="selectedRegion"
-                            :color-mapping="colorMapping"
+                                :data="statsRegion['nr'][kpiColumn]"
+                                :kpiColumn="kpiColumn"
+                                :time-unit="timeUnit"
+                                :region="selectedRegion"
+                                :color-mapping="colorMapping"
+
                         />
                     </q-card>
                 </div>
@@ -150,14 +157,15 @@ const {colorMapping} = storeToRefs(mainStore);
             <q-tab-panel name="lte">
                 <div v-if="timeUnit==='daily'" class="row">
                     <q-card v-for="kpiColumn in kpiColumnsFlex['lte']" :key="`flex-${tab}-${kpiColumn}`"
-                            class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
-                            style="border: 1px blue solid;">
+                            :class="chartSizeClass.value"
+                            style="border: 1px blue solid;"
+                    >
                         <e-chart-line-multi
-                            :data="statsRegion['lte'][kpiColumn]"
-                            :kpiColumn="kpiColumn"
-                            :time-unit="timeUnit"
-                            :region="selectedRegion"
-                            :color-mapping="colorMapping"
+                                :data="statsRegion['lte'][kpiColumn]"
+                                :kpiColumn="kpiColumn"
+                                :time-unit="timeUnit"
+                                :region="selectedRegion"
+                                :color-mapping="colorMapping"
                         />
 
                     </q-card>

@@ -9,6 +9,10 @@ export const apiRoutes = {
     hourlyStatsRegion: '/hourlyStatsRegion',
     dailyStatsRegionFlex: '/dailyStatsRegionFlex',
     hourlyStatsRegionFlex: '/hourlyStatsRegionFlex',
+//     cell level
+    dailyStats: '/dailyStats',
+    hourlyStats: '/hourlyStats',
+    cellsList: '/cellsList',
 }
 
 export const apiGet = (urlRef) => {

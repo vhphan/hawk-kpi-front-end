@@ -14,10 +14,9 @@ export const useApiArray = (apiArray, executeCallback = null) => {
         const executePromisesArray = apiArray.map((api) => api.execute());
         await Promise.all(executePromisesArray);
         errorArray.forEach((error) => {
-            if (error.value) {
-                triggerNegative({message: error.value});
-                triggerNegative({message: 'Something went wrong.'})
-            }
+            if (error.value === null) return;
+            console.log(error);
+            triggerNegative({message: error.value.message || 'Something went wrong.'});
         });
         executeCallback && executeCallback();
     };

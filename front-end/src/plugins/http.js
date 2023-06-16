@@ -18,8 +18,10 @@ class MyFetch {
 
             onFetchError(ctx) {
                 // ctx.data can be null when 5xx response
+                triggerNegative({
+                    message: ctx.error.stack || ctx.error.message || 'Fetching data failed.',
+                });
                 console.log(ctx.error);
-                console.log(ctx.response.url)
                 return ctx;
             },
 

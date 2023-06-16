@@ -4,6 +4,7 @@ import {useLocalStorage} from "@vueuse/core";
 export const useMainStore = defineStore({
     id: 'mainStore',
     state: () => ({
+
         dailyStatsRegion: useLocalStorage('dailyStatsRegion', {
             nr: {},
             lte: {},
@@ -20,6 +21,26 @@ export const useMainStore = defineStore({
         }),
 
         hourlyStatsRegionMeta: useLocalStorage('hourlyStatsRegionMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsCell: useLocalStorage('dailyStatsCell', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsCell: useLocalStorage('hourlyStatsCell', {
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsCellMeta: useLocalStorage('dailyStatsCellMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsCellMeta: useLocalStorage('hourlyStatsCellMeta', {
             nr: {},
             lte: {},
         }),
@@ -89,6 +110,9 @@ export const useMainStore = defineStore({
         ],
 
         selectedRegion: useLocalStorage('selectedRegion', 'ALL'),
+
+        selectedCell: useLocalStorage('selectedCell', null),
+
         darkMode: useLocalStorage('darkMode', true),
 
         colorMapping: useLocalStorage('colorMapping', {
@@ -109,7 +133,7 @@ export const useMainStore = defineStore({
             {label: 'm', value: 'col-xs-12 col-md-6 col-lg-4 col-xl-3'},
         ),
 
-        chartSizeClassOptions:  [
+        chartSizeClassOptions: [
             {label: 'm', value: 'col-xs-12 col-md-6 col-lg-4 col-xl-3'},
             {label: 'l', value: 'col-xs-12 col-md-6 col-lg-5 col-xl-6'},
             {label: 'xl', value: 'col-xs-12 col-md-6 col-lg-6 col-xl-8'},
@@ -139,6 +163,20 @@ export const useMainStore = defineStore({
             return {
                 nr: Object.keys(dailyStatsRegionFlex.nr),
                 lte: Object.keys(dailyStatsRegionFlex.lte),
+            };
+        },
+        kpiColumnsHourly: (state) => {
+            const {hourlyStatsRegion} = state;
+            return {
+                nr: Object.keys(hourlyStatsRegion.nr),
+                lte: Object.keys(hourlyStatsRegion.lte),
+            };
+        },
+        kpiColumnsFlexHourly: (state) => {
+            const {hourlyStatsRegionFlex} = state;
+            return {
+                nr: Object.keys(hourlyStatsRegionFlex.nr),
+                lte: Object.keys(hourlyStatsRegionFlex.lte),
             };
         }
     }

@@ -11,8 +11,6 @@ export const triggerPositive = function (opts = {}) {
 }
 
 export const triggerNegative = function (opts = {}) {
-    console.log(opts.message);
-
     Notify.create({
         ...{
             type: 'negative',

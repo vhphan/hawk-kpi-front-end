@@ -64,6 +64,14 @@ const props = defineProps({
 });
 
 const getOption = function (kpiColumn, seriesArray, seriesName = '') {
+    if (seriesArray === undefined) {
+        debugger;
+        return {};
+    }
+    if (!seriesArray.map) {
+        debugger;
+        return {};
+    }
     return {
         renderer: 'canvas',
         legend: {

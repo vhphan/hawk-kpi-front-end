@@ -22,6 +22,21 @@ export const sidebarItems = [
         id: 3,
         routeName: 'Page3',
         comment: 'Daily Flex',
-
-    }
+    },
+    {
+        to: `${basePath}page4`,
+        icon: "schedule",
+        label: "Hourly Flex",
+        id: 4,
+        routeName: 'Page4',
+        comment: 'Hourly Flex',
+    },
+    // {
+    //     to: `${basePath}page5`,
+    //     icon: "schedule",
+    //     label: "Cell Daily",
+    //     id: 5,
+    //     routeName: 'Page5',
+    //     comment: 'Cell Daily',
+    // }
 ];

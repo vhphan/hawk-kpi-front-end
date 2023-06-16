@@ -15,7 +15,6 @@ const routes = [
         path: basePath + 'page1',
         name: 'Page1',
         component: Page1,
-
         meta: {label: 'Home'}
     },
     {
@@ -27,8 +26,19 @@ const routes = [
         path: basePath + 'page3',
         name: 'Page3',
         component: () => import('@/pages/Page3.vue'),
-
+    },
+    {
+        path: basePath + 'page4',
+        name: 'Page4',
+        component: () => import('@/pages/Page4.vue'),
     }
+    ,
+    {
+        path: basePath + 'page5',
+        name: 'Page5',
+        component: () => import('@/pages/Page5.vue'),
+    }
+
 
 ];
 const router = createRouter({

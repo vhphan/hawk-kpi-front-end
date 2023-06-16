@@ -3,7 +3,6 @@ GET https://g4djq4bh-3000.asse.devtunnels.ms/
 Accept: application/json
 Cookie: cookie: {{cookie}}
 
-
 ###
 GET {{baseUrl}}/node/kpi/v1/dailyStatsRegion?tech=nr
 Accept: application/json
@@ -30,4 +29,25 @@ GET http://localhost:3232/proxy/node/kpi/v1/dailyStatsRegion?tech=nr
 Accept: application/json
 
 ###
+GET http://localhost:5001/node/kpi/v1/dailyStats?tech=lte&cellId=DWKUL0414_L7_0030
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStats?tech=nr&cellId=DBKLG0493_N3_0310
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/cellsList?tech=nr&cellPartial=DWKUL&region=CENTRAL
+Accept: application/json
+
+###
 GET https://api.eprojecttrackers.com/node/dnbSocket/resetCodeTunnel
+
+###
+GET http://localhost:5001/node/kpi/v1/hourlyStatsRegion?tech=lte&region=ALL
+
+
+
+###
+GET http://localhost:5001/node/kpi/v1/cellsList?tech=nr
+Accept: application/json

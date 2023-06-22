@@ -33,6 +33,10 @@ GET http://localhost:5001/node/kpi/v1/dailyStats?tech=lte&cellId=DWKUL0414_L7_00
 Accept: application/json
 
 ###
+GET http://localhost:5001/node/kpi/v1/dailyStatsRegionFlex?tech=nr
+Accept: application/json
+
+###
 GET http://localhost:5001/node/kpi/v1/dailyStats?tech=nr&cellId=DBKLG0493_N3_0310
 Accept: application/json
 

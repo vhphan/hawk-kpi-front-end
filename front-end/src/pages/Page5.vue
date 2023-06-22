@@ -1,9 +1,7 @@
 <script setup>
 
-
-
-
 import CellStats from "@/pages/subPages/CellStats.vue";
+
 </script>
 
 <template>

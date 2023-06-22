@@ -23,27 +23,31 @@ const {
 const cellPartial = ref('');
 
 const endPoint = computed(() => {
-  return `cellsList?region=${selectedRegion.value}&tech=${props.tech}&cellPartial=${cellPartial.value}}`;
+  return `cellsList?region=${selectedRegion.value}&tech=${props.tech}&cellPartial=${cellPartial.value}`;
 });
 
-const cellList = computed(() => {
-  const {data, execute, isFetching} = apiGet(endPoint);
-  execute();
-  return data.map(d => d['cell_id']);
-});
+const {data, execute, isFetching} = apiGet(endPoint);
+const cellsList = ref([]);
+const getCellsList = async () => {
+  await execute();
+  if (!data.value || !data.value.data || !data.value.data.length) {
+    return [];
+  }
+  const results = data.value.data;
+  return results.map(d => d['cell_id']);
+};
 
-const options = ref([]);
 const model = ref(null);
 
-const filterFn = function (val, update, abort) {
+const filterFn = async function (val, update, abort) {
   // call abort() at any time if you can't retrieve data somehow
 
-  setTimeout(() => {
-    update(() => {
-      cellPartial.value = val;
-      options.value = cellList.value;
-    });
-  }, 100);
+  update(async () => {
+    cellPartial.value = val;
+    cellsList.value = await getCellsList();
+  });
+
+
 };
 
 const abortFilterFn = function () {
@@ -57,19 +61,21 @@ const abortFilterFn = function () {
 <template>
   <div class="q-pa-md">
     <div class="q-gutter-md">
+
       <q-select
           filled
           v-model="model"
-          use-input
           hide-selected
+          use-input
           fill-input
           input-debounce="0"
           label="Lazy filter"
-          :options="options"
+          :options="cellsList"
           @filter="filterFn"
           @filter-abort="abortFilterFn"
           style="width: 250px"
-          hint="With hide-selected and fill-input"
+          hint="hint"
+          :loading="isFetching"
       >
         <template v-slot:no-option>
           <q-item>

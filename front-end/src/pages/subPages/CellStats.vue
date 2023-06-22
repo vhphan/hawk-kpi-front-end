@@ -27,7 +27,7 @@ const tech = ref('nr');
       <q-radio v-model="tech" val="lte" label="LTE"/>
     </div>
 
-    <cell-selector/>
+    <cell-selector :tech="tech"/>
 
 
     <!--        <div class="col q-pl-md q-pt-md" v-if="regionMetaData[tab]['time']">-->

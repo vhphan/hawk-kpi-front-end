@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
 import Page1 from "../pages/Page1.vue";
-import Page2 from "../pages/Page2.vue";
 import {basePath} from "../config/constants.js";
 
 const routes = [
@@ -37,13 +36,12 @@ const routes = [
         path: basePath + 'page4',
         name: 'Page4',
         component: () => import('@/pages/Page4.vue'),
+    },
+    {
+        path: basePath + 'page5',
+        name: 'Page5',
+        component: () => import('@/pages/Page5.vue'),
     }
-    ,
-    // {
-    //     path: basePath + 'page5',
-    //     name: 'Page5',
-    //     component: () => import('@/pages/Page5.vue'),
-    // }
 
 
 ];

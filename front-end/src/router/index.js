@@ -6,6 +6,11 @@ import {basePath} from "../config/constants.js";
 
 const routes = [
     {
+        path: basePath + 'about',
+        name: 'About',
+        component: () => import('@/pages/About.vue'),
+    },
+    {
         path: "/",
         alias: [basePath, '/'],
         redirect: {name: 'Page1'},
@@ -17,10 +22,11 @@ const routes = [
         component: Page1,
         meta: {label: 'Home'}
     },
+
     {
         path: basePath + 'page2',
         name: 'Page2',
-        component: Page2,
+        component: () => import('@/pages/Page2.vue'),
     },
     {
         path: basePath + 'page3',
@@ -33,11 +39,11 @@ const routes = [
         component: () => import('@/pages/Page4.vue'),
     }
     ,
-    {
-        path: basePath + 'page5',
-        name: 'Page5',
-        component: () => import('@/pages/Page5.vue'),
-    }
+    // {
+    //     path: basePath + 'page5',
+    //     name: 'Page5',
+    //     component: () => import('@/pages/Page5.vue'),
+    // }
 
 
 ];

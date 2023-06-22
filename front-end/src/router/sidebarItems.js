@@ -2,6 +2,13 @@ import {basePath} from "@/config/constants";
 
 export const sidebarItems = [
     {
+        to: `${basePath}about`,
+        icon: "info",
+        label: "About",
+        id: 0,
+        routeName: 'About',
+    },
+    {
         to: `${basePath}page1`,
         icon: "calendar_month",
         label: "Daily",

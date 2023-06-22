@@ -2,6 +2,7 @@ import {createFetch} from "@vueuse/core";
 import {colorTrace} from "@/utils/myFunctions.js";
 import {triggerNegative} from "@/utils/notifications.js";
 
+console.log(import.meta.env.PROD);
 export function getBaseUrl() {
     if (import.meta.env.PROD) {
         return import.meta.env.VITE_API_BASE_URL_PROD_NODE;

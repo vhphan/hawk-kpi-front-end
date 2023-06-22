@@ -35,3 +35,5 @@ myApp.use(router);
 myApp.use(pinia);
 
 myApp.mount('#app');
+
+console.log(__APP_BUILD__);

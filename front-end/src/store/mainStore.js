@@ -15,12 +15,32 @@ export const useMainStore = defineStore({
             lte: {},
         }),
 
+        dailyStatsCluster: useLocalStorage('dailyStatsCluster', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsCluster: useLocalStorage('hourlyStatsCluster', {
+            nr: {},
+            lte: {},
+        }),
+
         dailyStatsRegionMeta: useLocalStorage('dailyStatsRegionMeta', {
             nr: {},
             lte: {},
         }),
 
         hourlyStatsRegionMeta: useLocalStorage('hourlyStatsRegionMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsClusterMeta: useLocalStorage('dailyStatsClusterMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsClusterMeta: useLocalStorage('hourlyStatsClusterMeta', {
             nr: {},
             lte: {},
         }),
@@ -78,6 +98,9 @@ export const useMainStore = defineStore({
             'SARAWAK',
         ],
 
+        clusters: useLocalStorage('clusters', []),
+
+
         regions: [
             {
                 label: 'CENTRAL',
@@ -111,7 +134,15 @@ export const useMainStore = defineStore({
 
         selectedRegion: useLocalStorage('selectedRegion', 'ALL'),
 
-        selectedCell: useLocalStorage('selectedCell', null),
+        selectedCell: useLocalStorage('selectedCell', {
+            nr: null,
+            lte: null,
+        }),
+
+        selectedCluster: useLocalStorage('selectedCluster', {
+            region: null,
+            cluster_id: null,
+        }),
 
         darkMode: useLocalStorage('darkMode', true),
 
@@ -141,6 +172,8 @@ export const useMainStore = defineStore({
             {label: 'full', value: 'col-xs-12 col-md-6 col-lg-12 col-xl-12'},
         ],
 
+        selectedTech: useLocalStorage('selectedTech', 'nr'),
+
     }),
     actions: {
         saveDailyStatsRegion(data, tech) {
@@ -152,10 +185,16 @@ export const useMainStore = defineStore({
     },
     getters: {
         kpiColumns: (state) => {
-            const {dailyStatsRegion} = state;
+            const {dailyStatsRegion, dailyStatsCluster} = state;
             return {
-                nr: Object.keys(dailyStatsRegion.nr),
-                lte: Object.keys(dailyStatsRegion.lte),
+                nr: [
+                    ...Object.keys(dailyStatsRegion.nr),
+                    ...Object.keys(dailyStatsCluster.nr),
+                ],
+                lte: [
+                    ...Object.keys(dailyStatsRegion.lte),
+                    ...Object.keys(dailyStatsCluster.lte),
+                ],
             };
         },
         kpiColumnsFlex: (state) => {
@@ -166,10 +205,16 @@ export const useMainStore = defineStore({
             };
         },
         kpiColumnsHourly: (state) => {
-            const {hourlyStatsRegion} = state;
+            const {hourlyStatsRegion, hourlyStatsCluster} = state;
             return {
-                nr: Object.keys(hourlyStatsRegion.nr),
-                lte: Object.keys(hourlyStatsRegion.lte),
+                nr: [
+                    ...Object.keys(hourlyStatsRegion.nr),
+                    ...Object.keys(hourlyStatsCluster.nr),
+                ],
+                lte: [
+                    ...Object.keys(hourlyStatsRegion.lte),
+                    ...Object.keys(hourlyStatsCluster.lte),
+                ],
             };
         },
         kpiColumnsFlexHourly: (state) => {
@@ -178,6 +223,13 @@ export const useMainStore = defineStore({
                 nr: Object.keys(hourlyStatsRegionFlex.nr),
                 lte: Object.keys(hourlyStatsRegionFlex.lte),
             };
+        },
+        clustersForSelectedRegion: (state) => {
+            const {clusters, selectedRegion} = state;
+            if (selectedRegion === 'ALL') {
+                return clusters;
+            }
+            return clusters.filter(cluster => cluster.region === selectedRegion);
         }
     }
 });

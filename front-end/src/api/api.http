@@ -48,10 +48,15 @@ Accept: application/json
 GET https://api.eprojecttrackers.com/node/dnbSocket/resetCodeTunnel
 
 ###
+GET https://api.eprojecttrackers.com/node/dnbSocket/resetCodeTunnel92
+
+###
 GET http://localhost:5001/node/kpi/v1/hourlyStatsRegion?tech=lte&region=ALL
-
-
 
 ###
 GET http://localhost:5001/node/kpi/v1/cellsList?tech=nr
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/clustersList
 Accept: application/json

@@ -8,8 +8,11 @@ export const sidebarItemsCategories = [
         label: 'Region',
     },
     {
-        label: 'Cell',
-    }
+        label: 'Cluster',
+    },
+    // {
+    //     label: 'Cell',
+    // }
 ];
 
 export const sidebarItems = [
@@ -59,11 +62,11 @@ export const sidebarItems = [
     {
         to: `${basePath}page5`,
         icon: "schedule",
-        label: "Cell Daily",
+        label: "Cluster Daily",
         id: 5,
         routeName: 'Page5',
-        comment: 'Cell Daily',
-        category: 'Cell',
+        comment: 'Cluster Daily',
+        category: 'Cluster',
     }
 
 ];

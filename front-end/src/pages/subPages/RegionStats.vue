@@ -23,7 +23,7 @@ const props = defineProps({
 // });
 const mainStore = useMainStore();
 
-const tab = ref('nr');
+const tab = storeToRefs(mainStore).selectedTech;
 
 const {
   selectedRegion,
@@ -91,7 +91,7 @@ watch(isLoading, () => {
 
 const {regionsArray} = storeToRefs(mainStore);
 
-watch([selectedRegion, tab], () => {
+watch(()=>urlRef.value, () => {
   execute && execute().then(() => {
     console.log(`Executed for ${selectedRegion.value}`);
   });
@@ -186,6 +186,7 @@ const regionMetaData = getRegionMetaData();
       </q-tab-panel>
 
     </q-tab-panels>
+
   </q-card>
 
 

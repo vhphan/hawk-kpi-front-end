@@ -86,7 +86,7 @@ watch(isLoading, () => {
 
 const {regionsArray} = storeToRefs(mainStore);
 
-watch([selectedRegion, tab], () => {
+watch(() => urlRef.value, () => {
   execute && execute().then(() => {
     console.log(`Executed for ${selectedRegion.value}`);
   });
@@ -167,9 +167,9 @@ const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
         <div class="row">
           <q-intersection
               v-for="kpiColumn in kpiColumns['lte']"
-                  :key="`flex-${tab}-${kpiColumn}`"
-                  :class="chartSizeClass.value"
-                  style="border: 1px blue solid;"
+              :key="`flex-${tab}-${kpiColumn}`"
+              :class="chartSizeClass.value"
+              style="border: 1px blue solid;"
           >
             <e-chart-line-multi
                 :data="statsRegion['lte'][kpiColumn]"

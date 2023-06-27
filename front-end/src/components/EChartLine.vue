@@ -63,7 +63,6 @@ const props = defineProps({
         type: String,
         default: '',
     },
-
 });
 
 
@@ -142,9 +141,12 @@ const getOption = function (kpiColumn, dataArray, seriesName = '') {
             axisLabel: {
                 inside: false,
                 formatter: (value) => {
+                    if (value >= 1000_000){
+                        return `${(value / 1000_000).toFixed(2)}M`;
+                    }
                     if (value >= 1000) {
-                        // return `${(value / 1000).toFixed(1)}k`;
-                        return value.toExponential(0);
+                        return `${(value / 1000).toFixed(0)}k`;
+                        // return value.toExponential(0);
                     }
                     return value;
                 }

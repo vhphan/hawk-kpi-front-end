@@ -110,8 +110,8 @@ const toggleRightDrawer = function () {
           <!--                            stretch-->
           <!--                            align="left"-->
           <!--                    >-->
-          <!--                        <q-route-tab :to="`${basePath}page1`" label="Page One" icon="inbox"/>-->
-          <!--                        <q-route-tab :to="`${basePath}page2`" label="Page Two" icon="star"/>-->
+          <!--                        <q-route-tab :to="`${basePath}RegionStatsDailyPage`" label="Page One" icon="inbox"/>-->
+          <!--                        <q-route-tab :to="`${basePath}RegionStatsHourlyPage`" label="Page Two" icon="star"/>-->
           <!--                    </q-tabs>-->
 
           <q-list padding

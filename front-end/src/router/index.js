@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
-import Page1 from "../pages/Page1.vue";
+import RegionStatsDailyPage from "../pages/RegionStatsDailyPage.vue";
 import {basePath} from "../config/constants.js";
 
 const routes = [
@@ -12,36 +12,41 @@ const routes = [
     {
         path: "/",
         alias: [basePath, '/'],
-        redirect: {name: 'Page1'},
+        redirect: {name: 'RegionStatsDailyPage'},
         name: 'Others',
     },
     {
-        path: basePath + 'page1',
-        name: 'Page1',
-        component: Page1,
+        path: basePath + 'RegionStatsDailyPage',
+        name: 'RegionStatsDailyPage',
+        component: RegionStatsDailyPage,
         meta: {label: 'Home'}
     },
 
     {
-        path: basePath + 'page2',
-        name: 'Page2',
-        component: () => import('@/pages/Page2.vue'),
+        path: basePath + 'RegionStatsHourlyPage',
+        name: 'RegionStatsHourlyPage',
+        component: () => import('@/pages/RegionStatsHourlyPage.vue'),
     },
     {
-        path: basePath + 'page3',
-        name: 'Page3',
-        component: () => import('@/pages/Page3.vue'),
+        path: basePath + 'RegionStatsDailyFlexPage',
+        name: 'RegionStatsDailyFlexPage',
+        component: () => import('@/pages/RegionStatsDailyFlexPage.vue'),
     },
     {
-        path: basePath + 'page4',
-        name: 'Page4',
-        component: () => import('@/pages/Page4.vue'),
+        path: basePath + 'RegionStatsHourlyFlexPage',
+        name: 'RegionStatsHourlyFlexPage',
+        component: () => import('@/pages/RegionStatsHourlyFlexPage.vue'),
     },
     {
-        path: basePath + 'page5',
-        name: 'Page5',
-        component: () => import('@/pages/Page5.vue'),
-    }
+        path: basePath + 'ClusterStatsDailyFlexPage',
+        name: 'ClusterStatsDailyFlexPage',
+        component: () => import('@/pages/ClusterStatsDailyPage.vue'),
+    },
+    {
+        path: basePath + 'ClusterStatsHourlyFlexPage',
+        name: 'ClusterStatsHourlyFlexPage',
+        component: () => import('@/pages/ClusterStatsHourlyPage.vue'),
+    },
 
 
 ];

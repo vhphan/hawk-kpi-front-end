@@ -52,10 +52,6 @@ const props = defineProps({
     type: String,
     default: 'dark',
   },
-  region: {
-    type: String,
-    default: '',
-  },
   cellName: {
     type: String,
     default: '',
@@ -65,11 +61,9 @@ const props = defineProps({
 
 const getOption = function (kpiColumn, seriesArray, seriesName = '') {
   if (seriesArray === undefined) {
-    debugger;
     return {};
   }
   if (!seriesArray.map) {
-    debugger;
     return {};
   }
   return {

@@ -114,15 +114,12 @@ watch(()=> urlRef.value, () => {
   }
   execute && execute().then(() => {
     console.log(`Executed for ${selectedCluster.value['cluster_id']} and ${tab.value}`);
-
-
   });
 }, {immediate: true});
 
 </script>
 
 <template>
-
   <div class="row">
     <region-selector class="col-xs-12 col-md-6 col-lg-4 col-xl-3 select-border"/>
     <cluster-selector class="col-xs-12 col-md-6 col-lg-4 col-xl-3 select-border"/>

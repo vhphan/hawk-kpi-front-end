@@ -9,9 +9,12 @@ export const apiRoutes = {
     hourlyStatsRegion: '/hourlyStatsRegion',
     dailyStatsRegionFlex: '/dailyStatsRegionFlex',
     hourlyStatsRegionFlex: '/hourlyStatsRegionFlex',
+
 //     cluster level
     dailyStatsCluster: '/dailyStatsCluster',
     hourlyStatsCluster: '/hourlyStatsCluster',
+    dailyStatsClusterFlex: '/dailyStatsClusterFlex',
+    hourlyStatsClusterFlex: '/hourlyStatsClusterFlex',
 
 //     cell level
     dailyStats: '/dailyStats',

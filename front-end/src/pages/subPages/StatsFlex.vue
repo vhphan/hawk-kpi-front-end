@@ -3,11 +3,9 @@
 import {useApiArray} from "@/composables/api.js";
 import {useQuasar} from 'quasar';
 import {apiGet, apiRoutes} from "@/api/apiCalls.js";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
-import {triggerNegative} from "@/utils/notifications.js";
-import EChartLine from "@/components/EChartLine.vue";
 import {generateUrl} from "@/utils/myFunctions.js";
 import EChartLineMulti from "@/components/EChartLineMulti.vue";
 
@@ -19,21 +17,85 @@ const props = defineProps({
       return ['daily', 'hourly'].includes(value);
     }
   },
+  level: {
+    type: String,
+    required: true,
+    validator(value) {
+      return ['cluster', 'region'].includes(value);
+    }
+  },
 });
 
 const mainStore = useMainStore();
 const tab = ref('nr');
 const {
   selectedRegion,
+  selectedCluster,
   kpiColumnsFlex,
   kpiColumnsFlexHourly,
   kpiToExclude
 } = storeToRefs(mainStore);
-const apiRoute = props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
+
+function getApiRoute() {
+  if (props.level === 'cluster') {
+    return props.timeUnit === 'daily' ? apiRoutes.dailyStatsClusterFlex : apiRoutes.hourlyStatsClusterFlex;
+  }
+  return props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
+}
+
+const apiRoute = getApiRoute();
+
 const urlRef = computed(() => {
+  if (props.level === 'cluster') {
+    return generateUrl(apiRoute, {tech: tab.value, cluster: selectedCluster.value['cluster_id']});
+  }
   return generateUrl(apiRoute, {tech: tab.value, region: selectedRegion.value});
 });
+
 const apiArray = [apiGet(urlRef)];
+
+function setStoreData() {
+  const {timeUnit, level} = props;
+  const data = dataArray.at(0).value;
+
+  const store = {
+    daily: {
+      region: mainStore.dailyStatsRegionFlex,
+      cluster: mainStore.dailyStatsClusterFlex,
+    },
+    hourly: {
+      region: mainStore.hourlyStatsRegionFlex,
+      cluster: mainStore.hourlyStatsClusterFlex,
+    },
+  };
+
+  const storeMeta = {
+    daily: {
+      region: mainStore.dailyStatsRegionFlexMeta,
+      cluster: mainStore.dailyStatsClusterFlexMeta,
+    },
+    hourly: {
+      region: mainStore.hourlyStatsRegionFlexMeta,
+      cluster: mainStore.hourlyStatsClusterFlexMeta,
+    },
+  };
+
+  if (store[timeUnit] && store[timeUnit][level]) {
+
+    const targetStore = store[timeUnit][level];
+    targetStore[tab.value] = data.data;
+
+    const targetStoreMeta = storeMeta[timeUnit][level];
+    targetStoreMeta[tab.value] = data.meta;
+
+    return;
+
+  }
+
+  throw new Error('Invalid timeUnit or level in setStoreData');
+
+}
+
 const {
   isFetchingArray,
   errorArray,
@@ -41,25 +103,25 @@ const {
   isLoading,
   execute,
 } = useApiArray(apiArray, () => {
-  const index = 0;
-  if (dataArray.length >= index + 1 && dataArray.at(index).value && dataArray.at(index).value.data) {
-    if (props.timeUnit === 'daily') {
-      mainStore.dailyStatsRegionFlex[tab.value] = dataArray.at(index).value.data;
-      mainStore.dailyStatsRegionFlexMeta[tab.value] = dataArray.at(index).value.meta;
-    }
-    if (props.timeUnit === 'hourly') {
-      mainStore.hourlyStatsRegionFlex[tab.value] = dataArray.at(index).value.data;
-      mainStore.hourlyStatsRegionFlexMeta[tab.value] = dataArray.at(index).value.meta;
-    }
+  if (dataArray.length >= 1 && dataArray.at(0).value && dataArray.at(0).value.data) {
+    setStoreData(0);
   }
 });
-const getStats = function (timeUnit) {
-  if (timeUnit === 'daily') {
-    return storeToRefs(mainStore).dailyStatsRegionFlex;
+const getStats = function (timeUnit, level) {
+  const stats = {
+    cluster: {
+      hourly: storeToRefs(mainStore).hourlyStatsClusterFlex,
+      daily: storeToRefs(mainStore).dailyStatsClusterFlex,
+    },
+    region: {
+      hourly: storeToRefs(mainStore).hourlyStatsRegionFlex,
+      daily: storeToRefs(mainStore).dailyStatsRegionFlex,
+    },
+  };
+  if (stats[level] && stats[level][timeUnit]) {
+    return stats[level][timeUnit];
   }
-  if (timeUnit === 'hourly') {
-    return storeToRefs(mainStore).hourlyStatsRegionFlex;
-  }
+  throw new Error('Invalid timeUnit or level');
 };
 const getKpiColumns = function (timeUnit) {
   if (timeUnit === 'daily') {
@@ -70,7 +132,7 @@ const getKpiColumns = function (timeUnit) {
   }
 };
 
-const statsRegion = getStats(props.timeUnit);
+const statsData = getStats(props.timeUnit, props.level);
 const kpiColumns = getKpiColumns(props.timeUnit);
 
 const $q = useQuasar();
@@ -152,12 +214,10 @@ const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
               style="border: 1px blue solid;"
           >
             <e-chart-line-multi
-                :data="statsRegion['nr'][kpiColumn]"
+                :data="statsData['nr'][kpiColumn]"
                 :kpiColumn="kpiColumn"
                 :time-unit="timeUnit"
-                :region="selectedRegion"
                 :color-mapping="colorMapping"
-
             />
           </q-intersection>
         </div>
@@ -172,10 +232,9 @@ const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
               style="border: 1px blue solid;"
           >
             <e-chart-line-multi
-                :data="statsRegion['lte'][kpiColumn]"
+                :data="statsData['lte'][kpiColumn]"
                 :kpiColumn="kpiColumn"
                 :time-unit="timeUnit"
-                :region="selectedRegion"
                 :color-mapping="colorMapping"
             />
           </q-intersection>

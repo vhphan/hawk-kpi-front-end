@@ -1,10 +1,5 @@
 <script setup>
-import WorkInProgress from "@/pages/subPages/WorkInProgress.vue";
 import ClusterStats from "@/pages/subPages/ClusterStats.vue";
-
-const isProduction = import.meta.env.PROD;
-
-
 </script>
 
 <template>

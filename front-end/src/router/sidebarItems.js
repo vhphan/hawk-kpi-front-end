@@ -60,22 +60,39 @@ export const sidebarItems = [
     },
 
     {
-        to: `${basePath}ClusterStatsDailyFlexPage`,
+        to: `${basePath}ClusterStatsDailyPage`,
         icon: "calendar_today",
-        label: "Cluster Daily",
+        label: "Daily",
         id: 5,
-        routeName: 'ClusterStatsDailyFlexPage',
-        comment: 'Cluster Daily',
+        routeName: 'ClusterStatsDailyPage',
+        comment: 'Daily',
         category: 'Cluster',
     },
-
     {
-        to: `${basePath}page6`,
+        to: `${basePath}ClusterStatsHourlyPage`,
         icon: "schedule",
-        label: "Cluster Hourly",
+        label: "Hourly",
         id: 6,
-        routeName: 'Page6',
-        comment: 'Cluster Hourly',
+        routeName: 'ClusterStatsHourlyPage',
+        comment: 'Hourly',
+        category: 'Cluster',
+    },
+    {
+        to: `${basePath}ClusterStatsDailyFlexPage`,
+        icon: "calendar_today",
+        label: "Daily Flex",
+        id: 7,
+        routeName: 'ClusterStatsDailyFlexPage',
+        comment: 'Daily Flex',
+        category: 'Cluster',
+    },
+    {
+        to: `${basePath}ClusterStatsHourlyFlexPage`,
+        icon: "schedule",
+        label: "Hourly Flex",
+        id: 8,
+        routeName: '',
+        comment: 'Hourly Flex',
         category: 'Cluster',
     }
 

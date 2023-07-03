@@ -71,22 +71,39 @@ export const useMainStore = defineStore({
         }),
 
         hourlyStatsRegionFlex: useLocalStorage('hourlyStatsRegion', {
-                nr: {},
-                lte: {},
-            }
-        ),
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsClusterFlex: useLocalStorage('dailyStatsCluster', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsClusterFlex: useLocalStorage('hourlyStatsCluster', {
+            nr: {},
+            lte: {},
+        }),
 
         dailyStatsRegionFlexMeta: useLocalStorage('dailyStatsRegionMeta', {
-                nr: {},
-                lte: {},
-            }
-        ),
+            nr: {},
+            lte: {},
+        }),
 
         hourlyStatsRegionFlexMeta: useLocalStorage('hourlyStatsRegionMeta', {
-                nr: {},
-                lte: {},
-            }
-        ),
+            nr: {},
+            lte: {},
+        }),
+
+        dailyStatsClusterFlexMeta: useLocalStorage('dailyStatsClusterMeta', {
+            nr: {},
+            lte: {},
+        }),
+
+        hourlyStatsClusterFlexMeta: useLocalStorage('hourlyStatsClusterMeta', {
+            nr: {},
+            lte: {},
+        }),
 
         regionsArray: [
             'ALL',
@@ -99,7 +116,6 @@ export const useMainStore = defineStore({
         ],
 
         clusters: useLocalStorage('clusters', []),
-
 
         regions: [
             {
@@ -198,10 +214,20 @@ export const useMainStore = defineStore({
             };
         },
         kpiColumnsFlex: (state) => {
-            const {dailyStatsRegionFlex} = state;
+            const {
+                dailyStatsRegionFlex,
+                dailyStatsClusterFlex
+            } = state;
             return {
-                nr: Object.keys(dailyStatsRegionFlex.nr),
-                lte: Object.keys(dailyStatsRegionFlex.lte),
+                nr: [
+                    ...Object.keys(dailyStatsRegionFlex.nr),
+                    ...Object.keys(dailyStatsClusterFlex.nr),
+                ]
+                ,
+                lte: [
+                    ...Object.keys(dailyStatsRegionFlex.lte),
+                    ...Object.keys(dailyStatsClusterFlex.lte),
+                ]
             };
         },
         kpiColumnsHourly: (state) => {
@@ -218,10 +244,19 @@ export const useMainStore = defineStore({
             };
         },
         kpiColumnsFlexHourly: (state) => {
-            const {hourlyStatsRegionFlex} = state;
+            const {
+                hourlyStatsRegionFlex,
+                hourlyStatsClusterFlex
+            } = state;
             return {
-                nr: Object.keys(hourlyStatsRegionFlex.nr),
-                lte: Object.keys(hourlyStatsRegionFlex.lte),
+                nr: [
+                    ...Object.keys(hourlyStatsRegionFlex.nr),
+                    ...Object.keys(hourlyStatsClusterFlex.nr),
+                ],
+                lte: [
+                    ...Object.keys(hourlyStatsRegionFlex.lte),
+                    ...Object.keys(hourlyStatsClusterFlex.lte),
+                ],
             };
         },
         clustersForSelectedRegion: (state) => {

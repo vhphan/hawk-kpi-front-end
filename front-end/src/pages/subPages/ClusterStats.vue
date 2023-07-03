@@ -11,6 +11,7 @@ import {useQuasar} from "quasar";
 import {generateUrl} from "@/utils/myFunctions.js";
 import {useApiArray} from "@/composables/api.js";
 import {triggerNegative, triggerWarning} from "@/utils/notifications.js";
+import WorkInProgress from "@/pages/subPages/WorkInProgress.vue";
 
 const mainStore = useMainStore();
 const tab = storeToRefs(mainStore).selectedTech;

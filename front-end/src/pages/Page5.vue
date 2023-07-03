@@ -9,8 +9,9 @@ const isProduction = import.meta.env.PROD;
 
 <template>
 
-  <work-in-progress v-if="isProduction"/>
-  <cluster-stats v-else time-unit="daily"/>
+<!--  <work-in-progress v-if="isProduction"/>-->
+<!--  <cluster-stats v-else time-unit="daily"/>-->
+<cluster-stats time-unit="daily" />
 
 </template>
 

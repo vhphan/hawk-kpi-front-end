@@ -16,14 +16,14 @@ export const sidebarItemsCategories = [
 ];
 
 export const sidebarItems = [
-    {
-        to: `${basePath}about`,
-        icon: "info",
-        label: "About",
-        id: 0,
-        routeName: 'About',
-        category: 'Info',
-    },
+    // {
+    //     to: `${basePath}about`,
+    //     icon: "info",
+    //     label: "About",
+    //     id: 0,
+    //     routeName: 'About',
+    //     category: 'Info',
+    // },
     {
         to: `${basePath}page1`,
         icon: "calendar_month",
@@ -61,11 +61,21 @@ export const sidebarItems = [
 
     {
         to: `${basePath}page5`,
-        icon: "schedule",
+        icon: "calendar_today",
         label: "Cluster Daily",
         id: 5,
         routeName: 'Page5',
         comment: 'Cluster Daily',
+        category: 'Cluster',
+    },
+
+    {
+        to: `${basePath}page6`,
+        icon: "schedule",
+        label: "Cluster Hourly",
+        id: 6,
+        routeName: 'Page6',
+        comment: 'Cluster Hourly',
         category: 'Cluster',
     }
 

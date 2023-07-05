@@ -19,10 +19,14 @@ class MyFetch {
 
             onFetchError(ctx) {
                 // ctx.data can be null when 5xx response
+                console.log(ctx.error);
+                if (ctx.error.message.indexOf("Failed to execute 'fetch' on 'Window'")>=0){
+                    return;
+                }
+
                 triggerNegative({
                     message: ctx.error.stack || ctx.error.message || 'Fetching data failed.',
                 });
-                console.log(ctx.error);
                 return ctx;
             },
 
@@ -59,6 +63,7 @@ class MyFetch {
 
         const errorMessage = data.data?.message || error.statusText;
 
+        debugger;
         triggerNegative({
             message: errorMessage,
         });

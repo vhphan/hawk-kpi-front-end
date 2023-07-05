@@ -1,5 +1,6 @@
 <script setup>
 const appBuild = __APP_BUILD__;
+const version = __APP_VERSION__;
 
 </script>
 
@@ -12,7 +13,7 @@ const appBuild = __APP_BUILD__;
 <!--    </q-card-section>-->
 <!--    <q-separator />-->
 <!--    <q-card-section >-->
-      <div>Version 0.1, Build: {{ appBuild }}</div>
+      <div>Version {{version}}, Build: {{ appBuild }}</div>
 <!--      <div class="q-mt-md"-->
 <!--           style="font-size: 20px;">-->
 

@@ -4,7 +4,7 @@ import {useLocalStorage} from "@vueuse/core";
 export const useMainStore = defineStore({
     id: 'mainStore',
     state: () => ({
-
+        version: useLocalStorage('version', '0.0.0'),
         dailyStatsRegion: useLocalStorage('dailyStatsRegion', {
             nr: {},
             lte: {},
@@ -65,42 +65,42 @@ export const useMainStore = defineStore({
             lte: {},
         }),
 
-        dailyStatsRegionFlex: useLocalStorage('dailyStatsRegion', {
+        dailyStatsRegionFlex: useLocalStorage('dailyStatsRegionFlex', {
             nr: {},
             lte: {},
         }),
 
-        hourlyStatsRegionFlex: useLocalStorage('hourlyStatsRegion', {
+        hourlyStatsRegionFlex: useLocalStorage('hourlyStatsRegionFlex', {
             nr: {},
             lte: {},
         }),
 
-        dailyStatsClusterFlex: useLocalStorage('dailyStatsCluster', {
+        dailyStatsClusterFlex: useLocalStorage('dailyStatsClusterFlex', {
             nr: {},
             lte: {},
         }),
 
-        hourlyStatsClusterFlex: useLocalStorage('hourlyStatsCluster', {
+        hourlyStatsClusterFlex: useLocalStorage('hourlyStatsClusterFlex', {
             nr: {},
             lte: {},
         }),
 
-        dailyStatsRegionFlexMeta: useLocalStorage('dailyStatsRegionMeta', {
+        dailyStatsRegionFlexMeta: useLocalStorage('dailyStatsRegionFlexMeta', {
             nr: {},
             lte: {},
         }),
 
-        hourlyStatsRegionFlexMeta: useLocalStorage('hourlyStatsRegionMeta', {
+        hourlyStatsRegionFlexMeta: useLocalStorage('hourlyStatsRegionFlexMeta', {
             nr: {},
             lte: {},
         }),
 
-        dailyStatsClusterFlexMeta: useLocalStorage('dailyStatsClusterMeta', {
+        dailyStatsClusterFlexMeta: useLocalStorage('dailyStatsClusterFlexMeta', {
             nr: {},
             lte: {},
         }),
 
-        hourlyStatsClusterFlexMeta: useLocalStorage('hourlyStatsClusterMeta', {
+        hourlyStatsClusterFlexMeta: useLocalStorage('hourlyStatsClusterFlexMeta', {
             nr: {},
             lte: {},
         }),

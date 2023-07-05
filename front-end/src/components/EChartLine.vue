@@ -55,10 +55,6 @@ const props = defineProps({
         type: String,
         default: 'dark',
     },
-    region: {
-        type: String,
-        default: '',
-    },
     cellName: {
         type: String,
         default: '',

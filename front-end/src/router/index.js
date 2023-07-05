@@ -1,13 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router';
-
-import RegionStatsDailyPage from "../pages/mainPages/standard/RegionStatsDailyPage.vue";
 import {basePath} from "../config/constants.js";
+import StatsStd from "@/pages/subPages/StatsStd.vue";
 
 const routes = [
     {
         path: basePath + 'about',
         name: 'About',
-        component: () => import('@/pages/mainPages/About.vue'),
+        component: () => import('@/pages/About.vue'),
     },
     {
         path: "/",
@@ -18,14 +17,22 @@ const routes = [
     {
         path: basePath + 'RegionStatsDailyPage',
         name: 'RegionStatsDailyPage',
-        component: RegionStatsDailyPage,
+        component: StatsStd,
+        props: {
+            timeUnit: 'daily',
+            level: 'region',
+        },
         meta: {label: 'Home'}
     },
 
     {
         path: basePath + 'RegionStatsHourlyPage',
         name: 'RegionStatsHourlyPage',
-        component: () => import('@/pages/mainPages/standard/RegionStatsHourlyPage.vue'),
+        component: () => import('@/pages/subPages/StatsStd.vue'),
+        props: {
+            timeUnit: 'hourly',
+            level: 'region',
+        }
     },
     {
         path: basePath + 'RegionStatsDailyFlexPage',
@@ -48,12 +55,20 @@ const routes = [
     {
         path: basePath + 'ClusterStatsDailyPage',
         name: 'ClusterStatsDailyPage',
-        component: () => import('@/pages/mainPages/standard/ClusterStatsDailyPage.vue'),
+        component: () => import('@/pages/subPages/StatsStd.vue'),
+        props: {
+            timeUnit: 'daily',
+            level: 'cluster',
+        }
     },
     {
         path: basePath + 'ClusterStatsHourlyPage',
         name: 'ClusterStatsHourlyPage',
-        component: () => import('@/pages/mainPages/standard/ClusterStatsHourlyPage.vue'),
+        component: () => import('@/pages/subPages/StatsStd.vue'),
+        props: {
+            timeUnit: 'hourly',
+            level: 'cluster',
+        }
     },
 
 

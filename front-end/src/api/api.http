@@ -60,3 +60,11 @@ Accept: application/json
 ###
 GET http://localhost:5001/node/kpi/v1/clustersList
 Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStatsCluster?tech=nr&cluster=PBDY_02
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStatsRegionFlex?tech=nr&region=ALL
+Accept: application/json

@@ -8,6 +8,7 @@ import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
 import {generateUrl} from "@/utils/myFunctions.js";
 import EChartLineMulti from "@/components/EChartLineMulti.vue";
+import ClusterSelector from "@/components/subComponents/ClusterSelector.vue";
 
 const props = defineProps({
   timeUnit: {
@@ -36,20 +37,21 @@ const {
   kpiToExclude
 } = storeToRefs(mainStore);
 
-function getApiRoute() {
+const apiRoute = computed(() => {
   if (props.level === 'cluster') {
     return props.timeUnit === 'daily' ? apiRoutes.dailyStatsClusterFlex : apiRoutes.hourlyStatsClusterFlex;
   }
   return props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
-}
-
-const apiRoute = getApiRoute();
+});
 
 const urlRef = computed(() => {
-  if (props.level === 'cluster') {
-    return generateUrl(apiRoute, {tech: tab.value, cluster: selectedCluster.value['cluster_id']});
+  if (props.level === 'cluster' && (!selectedCluster.value || !selectedCluster.value['cluster_id'])) {
+    return '';
   }
-  return generateUrl(apiRoute, {tech: tab.value, region: selectedRegion.value});
+    if (props.level === 'cluster') {
+    return generateUrl(apiRoute.value, {tech: tab.value, cluster: selectedCluster.value['cluster_id']});
+  }
+  return generateUrl(apiRoute.value, {tech: tab.value, region: selectedRegion.value});
 });
 
 const apiArray = [apiGet(urlRef)];
@@ -88,6 +90,9 @@ function setStoreData() {
     const targetStoreMeta = storeMeta[timeUnit][level];
     targetStoreMeta[tab.value] = data.meta;
 
+    // refresh the charts
+
+
     return;
 
   }
@@ -104,25 +109,10 @@ const {
   execute,
 } = useApiArray(apiArray, () => {
   if (dataArray.length >= 1 && dataArray.at(0).value && dataArray.at(0).value.data) {
-    setStoreData(0);
+    setStoreData();
   }
 });
-const getStats = function (timeUnit, level) {
-  const stats = {
-    cluster: {
-      hourly: storeToRefs(mainStore).hourlyStatsClusterFlex,
-      daily: storeToRefs(mainStore).dailyStatsClusterFlex,
-    },
-    region: {
-      hourly: storeToRefs(mainStore).hourlyStatsRegionFlex,
-      daily: storeToRefs(mainStore).dailyStatsRegionFlex,
-    },
-  };
-  if (stats[level] && stats[level][timeUnit]) {
-    return stats[level][timeUnit];
-  }
-  throw new Error('Invalid timeUnit or level');
-};
+
 const getKpiColumns = function (timeUnit) {
   if (timeUnit === 'daily') {
     return kpiColumnsFlex;
@@ -132,7 +122,24 @@ const getKpiColumns = function (timeUnit) {
   }
 };
 
-const statsData = getStats(props.timeUnit, props.level);
+const statsData = computed(() => {
+  const {timeUnit, level} = props;
+  const stats = {
+    cluster: {
+      hourly: mainStore.hourlyStatsClusterFlex,
+      daily: mainStore.dailyStatsClusterFlex,
+    },
+    region: {
+      hourly: mainStore.hourlyStatsRegionFlex,
+      daily: mainStore.dailyStatsRegionFlex,
+    },
+  };
+  if (stats[level] && stats[level][timeUnit]) {
+    return stats[level][timeUnit];
+  }
+  throw new Error('Invalid timeUnit or level');
+});
+
 const kpiColumns = getKpiColumns(props.timeUnit);
 
 const $q = useQuasar();
@@ -149,23 +156,41 @@ watch(isLoading, () => {
 const {regionsArray} = storeToRefs(mainStore);
 
 watch(() => urlRef.value, () => {
+
+  if (urlRef.value.length === 0) {
+    return;
+  }
+
+  if (props.level === 'cluster' && (!selectedCluster.value || !selectedCluster.value['cluster_id'])) {
+    return;
+  }
   execute && execute().then(() => {
-    console.log(`Executed for ${selectedRegion.value}`);
+    console.log(`Executed for ${selectedRegion.value} and ${selectedCluster.value['cluster_id']}`);
   });
 }, {immediate: true});
 
 const getRegionMetaData = function () {
-  if (props.timeUnit === 'daily') {
-    return storeToRefs(mainStore).dailyStatsRegionFlexMeta;
+  const metaData = {
+    daily: {
+      region: mainStore.dailyStatsRegionFlexMeta,
+      cluster: mainStore.dailyStatsClusterFlexMeta,
+    },
+    hourly: {
+      region: mainStore.hourlyStatsRegionFlexMeta,
+      cluster: mainStore.hourlyStatsClusterFlexMeta,
+    },
+  };
+  if (metaData[props.timeUnit] && metaData[props.timeUnit][props.level]) {
+    return metaData[props.timeUnit][props.level];
   }
-  if (props.timeUnit === 'hourly') {
-    return storeToRefs(mainStore).hourlyStatsRegionFlexMeta;
-  }
+  throw new Error('Invalid timeUnit or level');
 };
 
-const regionMetaData = getRegionMetaData();
+const metaData = getRegionMetaData();
 
 const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
+
+
 
 
 </script>
@@ -180,10 +205,15 @@ const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
         class="col-xs-12 col-md-6 col-lg-4 col-xl-3 q-mb-md"
         outlined
     />
-    <div class="col q-pl-md q-pt-md" v-if="regionMetaData[tab]['time']">
-      <span>Data Fetched @: {{ new Date(regionMetaData[tab]['time']) }}, &nbsp</span>
-      <span>Region: {{ regionMetaData[tab]['region'] }}, &nbsp</span>
-      <span>Tech: {{ regionMetaData[tab]['tech'].toUpperCase() }}, &nbsp</span>
+    <cluster-selector
+        v-if="props.level === 'cluster'"
+        class="col-xs-12 col-md-6 col-lg-4 col-xl-3 q-mb-md"
+        outlined
+    />
+    <div class="col q-pl-md q-pt-md" v-if="metaData[tab]['time']">
+      <span>Data Fetched @: {{ new Date(metaData[tab]['time']) }}, &nbsp</span>
+      <span>Region: {{ metaData[tab]['region'] }}, &nbsp</span>
+      <span>Tech: {{ metaData[tab]['tech'].toUpperCase() }}, &nbsp</span>
     </div>
   </div>
   <q-card>
@@ -205,38 +235,27 @@ const {colorMapping, chartSizeClass} = storeToRefs(mainStore);
 
     <q-tab-panels v-model="tab" animated>
 
-      <q-tab-panel name="nr">
-        <div class="row">
-          <q-intersection
-              v-for="kpiColumn in kpiColumns['nr'].filter(k=>kpiToExclude.indexOf(k)===-1)"
-              :key="`flex-${tab}-${kpiColumn}`"
-              :class="chartSizeClass.value"
-              style="border: 1px blue solid;"
-          >
-            <e-chart-line-multi
-                :data="statsData['nr'][kpiColumn]"
-                :kpiColumn="kpiColumn"
-                :time-unit="timeUnit"
-                :color-mapping="colorMapping"
-            />
-          </q-intersection>
-        </div>
-      </q-tab-panel>
 
-      <q-tab-panel name="lte">
+      <q-tab-panel v-for="tech in ['nr', 'lte']" :name="tech">
         <div class="row">
           <q-intersection
-              v-for="kpiColumn in kpiColumns['lte']"
-              :key="`flex-${tab}-${kpiColumn}`"
+              v-for="kpiColumn in kpiColumns[tech].filter(k=>kpiToExclude.indexOf(k)===-1)"
+              :key="`flex-${tab}-${kpiColumn}-${level}-${timeUnit}`"
               :class="chartSizeClass.value"
               style="border: 1px blue solid;"
           >
             <e-chart-line-multi
-                :data="statsData['lte'][kpiColumn]"
+                v-if="statsData[tech][kpiColumn]"
+                :data="statsData[tech][kpiColumn]"
                 :kpiColumn="kpiColumn"
                 :time-unit="timeUnit"
                 :color-mapping="colorMapping"
             />
+<!--            <q-card v-else>-->
+<!--              <q-card-section>-->
+<!--                <div class="text-h6">No Data for {{kpiColumn}}</div>-->
+<!--              </q-card-section>-->
+<!--            </q-card>-->
           </q-intersection>
         </div>
       </q-tab-panel>

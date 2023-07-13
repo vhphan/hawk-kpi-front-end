@@ -90,6 +90,15 @@ const routes = [
             level: 'cluster',
         }
     },
+    {
+        path: basePath + 'CellStatsDailyPage',
+        name: 'CellStatsDailyPage',
+        component: () => import('@/pages/subPages/StatsStd.vue'),
+        props: {
+            timeUnit: 'daily',
+            level: 'cell',
+        }
+    }
 
 
 ];

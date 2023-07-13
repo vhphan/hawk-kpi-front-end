@@ -68,3 +68,40 @@ Accept: application/json
 ###
 GET http://localhost:5001/node/kpi/v1/dailyStatsRegionFlex?tech=nr&region=ALL
 Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/cellsList?region=ALL&tech=nr&cellPartial=
+Accept: application/
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStatsCell?tech=nr&cell=DWKUL0020_N3_0330
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStatsCells?tech=nr&cells[]=DWKUL0020_N3_0310&cells[]=DWKUL0020_N3_0330
+Accept: application/json
+
+###
+POST http://localhost:3000/node/kpi/v1/
+
+Content-Type: application/json
+{
+    "tech": "nr",
+    "cells": [
+        "DWKUL0020_N3_0310",
+        "DWKUL0020_N3_0330"
+    ]
+}
+
+
+###
+GET http://localhost:5001/node/kpi/v1/cellsList?region=CENTRAL&tech=nr&cellPartial=DWKUL
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/dailyStatsCell?tech=nr&cell=DWKUL0020_N3_0330
+Accept: application/json
+
+###
+GET http://localhost:5001/node/kpi/v1/siteIdPrefixList
+Accept: application/json

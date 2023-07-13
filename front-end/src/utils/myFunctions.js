@@ -526,3 +526,7 @@ export const generateUrl = function (url, params = {}) {
     const query = new URLSearchParams(params).toString();
     return url + '?' + query;
 };
+
+export const getTimestamp = function () {
+    return Math.floor(Date.now() / 1000);
+}

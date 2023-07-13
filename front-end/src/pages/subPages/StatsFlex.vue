@@ -45,6 +45,7 @@ const apiRoute = computed(() => {
 });
 
 const urlRef = computed(() => {
+  console.log('urlRef computed');;
   if (props.level === 'cluster' && (!selectedCluster.value || !selectedCluster.value['cluster_id'])) {
     return '';
   }

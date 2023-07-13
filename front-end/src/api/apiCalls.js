@@ -17,12 +17,20 @@ export const apiRoutes = {
     hourlyStatsClusterFlex: '/hourlyStatsClusterFlex',
 
 //     cell level
-    dailyStats: '/dailyStats',
-    hourlyStats: '/hourlyStats',
+    dailyStatsCell: '/dailyStatsCell',
+    hourlyStatsCell: '/hourlyStatsCell',
+    dailyStatsCellFlex: '/dailyStatsCellFlex',
+    hourlyStatsCellFlex: '/hourlyStatsCellFlex',
+
+
+    // Lists
     cellsList: '/cellsList',
+    sitesList: '/sitesList',
     clustersList: '/clustersList',
+    kpiList: '/kpiList',
+    siteIdPrefixList: '/siteIdPrefixList',
 }
 
-export const apiGet = (urlRef) => {
-    return api().get(urlRef);
+export const apiGet = (urlRef, options={}) => {
+    return api().get(urlRef, options);
 }

@@ -1,5 +1,7 @@
 import {defineStore} from 'pinia';
 import {useLocalStorage} from "@vueuse/core";
+import {apiRoutes} from "@/api/apiCalls.js";
+import {generateUrl} from "@/utils/myFunctions.js";
 
 export const useMainStore = defineStore({
     id: 'mainStore',
@@ -190,6 +192,9 @@ export const useMainStore = defineStore({
 
         selectedTech: useLocalStorage('selectedTech', 'nr'),
 
+        kpiList: useLocalStorage('kpiList', {}),
+        kpiListFlex: useLocalStorage('kpiListFlex', {}),
+
     }),
     actions: {
         saveDailyStatsRegion(data, tech) {
@@ -205,7 +210,7 @@ export const useMainStore = defineStore({
             return {
                 nr: [
                     ...Object.keys(dailyStatsRegion.nr),
-                    ...Object.keys(dailyStatsCluster.nr),
+                    ...Object.keys(dailyStatsCluster.nr)
                 ],
                 lte: [
                     ...Object.keys(dailyStatsRegion.lte),
@@ -222,12 +227,12 @@ export const useMainStore = defineStore({
                 nr: [
                     ...Object.keys(dailyStatsRegionFlex.nr),
                     ...Object.keys(dailyStatsClusterFlex.nr),
-                ]
-                ,
+                ]                ,
                 lte: [
                     ...Object.keys(dailyStatsRegionFlex.lte),
                     ...Object.keys(dailyStatsClusterFlex.lte),
-                ]
+                ],
+
             };
         },
         kpiColumnsHourly: (state) => {
@@ -265,6 +270,64 @@ export const useMainStore = defineStore({
                 return clusters;
             }
             return clusters.filter(cluster => cluster.region === selectedRegion);
+        },
+        selectedClusterId: (state) => {
+            const {selectedCluster} = state;
+            return selectedCluster.cluster_id;
+        },
+        urlForPage: (state)  => (kpiType, level, timeUnit) => {
+            const {selectedRegion, selectedCluster, selectedTech, selectedCell, selectedClusterId} = state;
+            const clusterId = selectedCluster.cluster_id;
+
+            function getApiRouteForStandardKpi() {
+                if (level === 'cluster') {
+                    return timeUnit === 'daily' ? apiRoutes.dailyStatsCluster : apiRoutes.hourlyStatsCluster;
+                }
+                if (level === 'cell') {
+                    return timeUnit === 'daily' ? apiRoutes.dailyStatsCell : apiRoutes.hourlyStatsCell;
+                }
+                return timeUnit === 'daily' ? apiRoutes.dailyStatsRegion : apiRoutes.hourlyStatsRegion;
+            }
+
+            function getApiRouteForFlexKpi() {
+                if (level === 'cluster') {
+                    return timeUnit === 'daily' ? apiRoutes.dailyStatsClusterFlex : apiRoutes.hourlyStatsClusterFlex;
+                }
+                if (level === 'cell') {
+                    return timeUnit === 'daily' ? apiRoutes.dailyStatsCellFlex : apiRoutes.hourlyStatsCellFlex;
+                }
+                return timeUnit === 'daily' ? apiRoutes.dailyStatsRegionFlex : apiRoutes.hourlyStatsRegionFlex;
+            }
+
+            function getUrl() {
+                const apiRoute = kpiType === 'standard' ? getApiRouteForStandardKpi() : getApiRouteForFlexKpi();
+                if (level === 'cluster') {
+                    return generateUrl(apiRoute, {
+                        region: selectedRegion,
+                        cluster: selectedClusterId,
+                        tech: selectedTech,
+                    });
+                }
+                if (level === 'cell') {
+                    return generateUrl(apiRoute, {
+                        region: selectedRegion,
+                        cell: selectedCell[selectedTech],
+                        tech: selectedTech,
+                    });
+                }
+                return generateUrl(apiRoute, {
+                    region: selectedRegion,
+                    tech: selectedTech,
+                });
+            }
+
+            return getUrl();
+
+        },
+        urlForDailyStatsRegion: (state) => {
+            const {urlForPage} = state;
+            return urlForPage('standard', 'region', 'daily');
         }
+
     }
 });

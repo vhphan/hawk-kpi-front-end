@@ -14,14 +14,14 @@ export const useApiArray = (apiArray, executeCallback = null) => {
         const executePromisesArray = apiArray.map((api) => {
 
             try {
-                api.execute();
+                return api.execute();
             } catch (e) {
                 console.log(e);
-                return Promise.resolve();
+                return Promise.resolve({status: 'rejected', reason: e});
             }
 
         });
-        await Promise.all(executePromisesArray);
+        await Promise.allSettled(executePromisesArray);
         errorArray.forEach((error) => {
             console.log(error);
             if (error.value === null) return;

@@ -10,20 +10,20 @@ export const sidebarItemsCategories = [
     {
         label: 'Cluster',
     },
-    // {
-    //     label: 'Cell',
-    // }
+    {
+        label: 'Cell',
+    }
 ];
 
 export const sidebarItems = [
-    // {
-    //     to: `${basePath}about`,
-    //     icon: "info",
-    //     label: "About",
-    //     id: 0,
-    //     routeName: 'About',
-    //     category: 'Info',
-    // },
+    {
+        to: `${basePath}about`,
+        icon: "info",
+        label: "About",
+        id: 0,
+        routeName: 'About',
+        category: 'Info',
+    },
     {
         to: `${basePath}RegionStatsDailyPage`,
         icon: "calendar_month",
@@ -91,9 +91,18 @@ export const sidebarItems = [
         icon: "schedule",
         label: "Hourly Flex",
         id: 8,
-        routeName: '',
+        routeName: 'ClusterStatsHourlyFlexPage',
         comment: 'Hourly Flex',
         category: 'Cluster',
+    },
+    {
+        to: `${basePath}CellStatsDailyPage`,
+        icon: "calendar_today",
+        label: "Daily",
+        id: 9,
+        routeName: 'CellStatsDailyPage',
+        comment: 'Daily Cell',
+        category: 'Cell',
     }
 
 ];

@@ -1,13 +1,15 @@
 <script setup>
 import {useApiArray} from "@/composables/api.js";
-import {useQuasar} from 'quasar';
+import {debounce, useQuasar} from 'quasar';
 import {apiGet, apiRoutes} from "@/api/apiCalls.js";
-import {computed, watch} from "vue";
+import {computed, onMounted, onUpdated, ref, watch} from "vue";
 import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
 import EChartLine from "@/components/EChartLine.vue";
-import {generateUrl} from "@/utils/myFunctions.js";
+import {generateUrl, getTimestamp} from "@/utils/myFunctions.js";
 import ClusterSelector from "@/components/subComponents/ClusterSelector.vue";
+import CellSelector from "@/components/subComponents/CellSelector.vue";
+import {triggerWarning} from "@/utils/notifications.js";
 
 const props = defineProps({
   timeUnit: {
@@ -21,87 +23,61 @@ const props = defineProps({
     type: String,
     default: 'region',
     validator(value) {
-      return ['cluster', 'region'].includes(value);
+      return ['cluster', 'region', 'cell', 'site'].includes(value);
     }
   },
 });
 
-// const {data, execute, isFetching} = apiGet(apiRoutes.dailyStatsRegion, {
-//     tech: 'nr'
-// });
 const mainStore = useMainStore();
-
-const tab = storeToRefs(mainStore).selectedTech;
-
+const {selectedTech: tab} = storeToRefs(mainStore);
 const {
   selectedRegion,
-  selectedCluster,
+  selectedClusterId,
+  selectedCell,
+  urlForDailyStatsRegion
 } = storeToRefs(mainStore);
 
-
-const apiRoute = computed(() => {
-  if (props.level === 'cluster') {
-    return props.timeUnit === 'daily' ? apiRoutes.dailyStatsCluster : apiRoutes.hourlyStatsCluster;
-  }
-  return props.timeUnit === 'daily' ? apiRoutes.dailyStatsRegion : apiRoutes.hourlyStatsRegion;
-});
-
-const urlRef = computed(() => {
-  console.log('urlRef computed');
-  if (props.level === 'cluster' && (!selectedCluster.value || !selectedCluster.value['cluster_id'])) {
-    return '';
-  }
-  return generateUrl(apiRoute.value, {
-    tech: tab.value,
-    region: selectedRegion.value,
-    cluster: selectedCluster.value['cluster_id']
-  });
-});
-
-const apiArray = [apiGet(urlRef)];
+const urlRef = computed(() =>
+    mainStore.urlForPage('standard', props.level, props.timeUnit)
+);
 
 function setStoreData() {
-
+  console.log('setStoreData');
   const {timeUnit, level} = props;
   const data = dataArray.at(0).value;
-
-  const store = {
-    daily: {
-      region: mainStore.dailyStatsRegion,
-      cluster: mainStore.dailyStatsCluster,
-    },
-    hourly: {
-      region: mainStore.hourlyStatsRegion,
-      cluster: mainStore.hourlyStatsCluster,
-    },
-  };
-
-  const storeMeta = {
-    daily: {
-      region: mainStore.dailyStatsRegionMeta,
-      cluster: mainStore.dailyStatsClusterMeta,
-    },
-    hourly: {
-      region: mainStore.hourlyStatsRegionMeta,
-      cluster: mainStore.hourlyStatsClusterMeta,
-    },
-  };
-
-  if (store[timeUnit] && store[timeUnit][level]) {
-
-    const targetStore = store[timeUnit][level];
-    targetStore[tab.value] = data.data;
-
-    const targetStoreMeta = storeMeta[timeUnit][level];
-    targetStoreMeta[tab.value] = data.meta;
-
+  if (!data) {
+    console.log('No data');
     return;
-
   }
+  const storeMeta = getMetaData();
 
+  if (statsData && Object.keys(statsData).includes('nr') && Object.keys(statsData).includes('lte')) {
+    statsData[tab.value] = data.data;
+    storeMeta[tab.value] = data.meta;
+    updateTimeInSeconds.value = getTimestamp();
+    return;
+  }
+  console.log(statsData.value);
   throw new Error('Invalid timeUnit or level in setStoreData');
-
 }
+
+function clearStoreData() {
+  console.log('clearStoreData');
+  const {timeUnit, level} = props;
+  const storeMeta = getMetaData();
+  triggerWarning({
+    message: 'Invalid or No Selection. Select a valid option.'
+  });
+  if (statsData && Object.keys(statsData).includes('nr') && Object.keys(statsData).includes('lte')) {
+    statsData[tab.value] = [];
+    storeMeta[tab.value] = {};
+    return;
+  }
+  console.log(statsData.value);
+  throw new Error('Invalid timeUnit or level in clearStoreData');
+}
+
+const updateTimeInSeconds = ref(getTimestamp());
 
 const {
   isFetchingArray,
@@ -109,78 +85,48 @@ const {
   dataArray,
   isLoading,
   execute,
-} = useApiArray(apiArray, () => {
-  if (dataArray.length >= 1 && dataArray.at(0).value && dataArray.at(0).value.data) {
-    setStoreData();
-  }
-});
+} = useApiArray([apiGet(urlRef)],
+    () => {
+      console.log(`Executed for ${props.timeUnit} and ${props.level} with ${urlRef.value}`);
+      // setStoreData();
+    }
+);
 
-const kpiColumns = computed(() => {
-  if (props.timeUnit === 'daily') {
-    return mainStore.kpiColumns;
-  }
-  if (props.timeUnit === 'hourly') {
-    return mainStore.kpiColumnsHourly;
-  }
-});
+const kpiColumns = storeToRefs(mainStore).kpiList;
 
-const statsData = computed(() => {
-  const stats = {
-    cluster: {
-      hourly: mainStore.hourlyStatsCluster,
-      daily: mainStore.dailyStatsCluster,
-    },
-    region: {
-      hourly: mainStore.hourlyStatsRegion,
-      daily: mainStore.dailyStatsRegion,
-    },
-  };
-  if (stats[props.level] && stats[props.level][props.timeUnit]) {
-    return stats[props.level][props.timeUnit];
-  }
-  throw new Error('Invalid timeUnit or level');
-});
+const statsStoreLookup = {
+  cluster: {
+    hourly: mainStore.hourlyStatsCluster,
+    daily: mainStore.dailyStatsCluster,
+  },
+  region: {
+    hourly: mainStore.hourlyStatsRegion,
+    daily: mainStore.dailyStatsRegion,
+  },
+  cell: {
+    hourly: mainStore.hourlyStatsCell,
+    daily: mainStore.dailyStatsCell,
+  },
+};
+
+const statsData = statsStoreLookup[props.level][props.timeUnit];
 
 const $q = useQuasar();
 
-watch(isLoading, () => {
-  if (isLoading.value) {
-    $q.loading.show({});
-    return;
-  }
-  $q.loading.hide();
-});
 
 const {regionsArray} = storeToRefs(mainStore);
-
-function fetchDataFromServer() {
-  console.log('watching urlRef.value triggered');
-
-  if (urlRef.value.length === 0) {
-    return;
-  }
-  if (props.level === 'cluster' && (!selectedCluster.value || !selectedCluster.value['cluster_id'])) {
-    return;
-  }
-
-  execute && execute().then(() => {
-    console.log(`Executed for ${selectedRegion.value} and ${selectedCluster.value['cluster_id']}`);
-  });
-}
-
-watch(()=>urlRef.value, () => {
-  fetchDataFromServer();
-}, {immediate: true});
 
 const getMetaData = function () {
   const metaData = {
     daily: {
       region: mainStore.dailyStatsRegionMeta,
       cluster: mainStore.dailyStatsClusterMeta,
+      cell: mainStore.dailyStatsCellMeta,
     },
     hourly: {
       region: mainStore.hourlyStatsRegionMeta,
       cluster: mainStore.hourlyStatsClusterMeta,
+      cell: mainStore.hourlyStatsCellMeta,
     },
   };
   if (metaData[props.timeUnit] && metaData[props.timeUnit][props.level]) {
@@ -191,6 +137,27 @@ const getMetaData = function () {
 
 const metaData = getMetaData();
 
+onMounted(() => {
+  console.log('onMounted');
+});
+
+onUpdated(() => {
+  console.log('onUpdated');
+});
+
+watch(isLoading, (newValue, oldValue) => {
+  if (isLoading.value) {
+    $q.loading.show({});
+    return;
+  }
+  $q.loading.hide();
+
+  if (urlRef.value.includes('null') || urlRef.value.includes('undefined')) {
+    clearStoreData();
+    return;
+  }
+  setStoreData();
+});
 
 </script>
 
@@ -204,11 +171,17 @@ const metaData = getMetaData();
         outlined
     />
     <cluster-selector
-        v-if="props.level === 'cluster'"
+        v-if="level === 'cluster'"
         class="col-xs-12 col-md-6 col-lg-4 col-xl-3 q-mb-md"
         outlined
     />
-    <div class="col q-pl-md q-pt-md" v-if="metaData[tab]['time']">
+    <cell-selector
+        v-if="level === 'cell'"
+        :tech="tab"
+        class="col-xs-12 col-md-6 col-lg-4 col-xl-3 q-mb-md"
+        outlined
+    />
+    <div class="col q-pl-md q-pt-md" v-if="metaData[tab] && metaData[tab]['time']">
       <span>Data Fetched @: {{ new Date(metaData[tab]['time']) }}, &nbsp</span>
       <span>Region: {{ metaData[tab]['region'] }}, &nbsp</span>
       <span>Tech: {{ metaData[tab]['tech'].toUpperCase() }}, &nbsp</span>
@@ -235,70 +208,31 @@ const metaData = getMetaData();
 
     <q-tab-panels v-model="tab" animated>
 
-      <!--      <q-tab-panel name="nr">-->
-      <!--        <div class="row">-->
-      <!--          <q-intersection-->
-      <!--              v-for="kpiColumn in kpiColumns['nr']"-->
-      <!--              class="col-xs-12 col-md-6 col-lg-4 col-xl-3"-->
-      <!--              style="border: 1px blue solid;"-->
-      <!--          >-->
-      <!--            <e-chart-line-->
-      <!--                :key="`${tab}-${kpiColumn}-${level}-${timeUnit}`"-->
-      <!--                :data="statsData['nr'][kpiColumn]"-->
-      <!--                :kpiColumn="kpiColumn"-->
-      <!--                seriesName="nr"-->
-      <!--                :time-unit="timeUnit"-->
-      <!--                :region="selectedRegion"-->
-      <!--            />-->
-      <!--          </q-intersection>-->
-      <!--        </div>-->
-      <!--      </q-tab-panel>-->
-
-      <!--      <q-tab-panel name="lte">-->
-      <!--        <div-->
-      <!--            class="row"-->
-      <!--        >-->
-      <!--          <q-intersection-->
-      <!--              v-for="kpiColumn in kpiColumns['lte']"-->
-      <!--              class="col-xs-12 col-md-6 col-lg-4 col-xl-3"-->
-      <!--              style="border: 1px blue solid;"-->
-      <!--          >-->
-      <!--            <e-chart-line-->
-      <!--                :key="`${tab}-${kpiColumn}-${level}-${timeUnit}`"-->
-      <!--                :data="statsData['lte'][kpiColumn]"-->
-      <!--                :kpiColumn="kpiColumn"-->
-      <!--                seriesName="lte"-->
-      <!--                :time-unit="timeUnit"-->
-      <!--            />-->
-      <!--          </q-intersection>-->
-      <!--        </div>-->
-      <!--      </q-tab-panel>-->
-      <!--      -->
-
-        <q-tab-panel v-for="tech in ['nr', 'lte']" :name="tech">
-          <div class="row">
-            <q-intersection
-                v-for="kpiColumn in kpiColumns[tech]"
-                class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
-                style="border: 1px blue solid;"
-            >
-              <e-chart-line
-                  v-if="statsData[tech][kpiColumn]"
-                  :key="`${tab}-${kpiColumn}-${level}-${timeUnit}`"
-                  :data="statsData[tech][kpiColumn]"
-                  :kpiColumn="kpiColumn"
-                  :seriesName="tech"
-                  :time-unit="timeUnit"
-                  :region="selectedRegion"
-              />
-<!--              <q-card v-else>-->
-<!--                <q-card-section>-->
-<!--                  <div class="text-h6">No Data for {{kpiColumn}}</div>-->
-<!--                </q-card-section>-->
-<!--              </q-card>-->
-            </q-intersection>
-          </div>
-        </q-tab-panel>
+      <q-tab-panel v-for="tech in ['nr', 'lte']" :name="tech">
+        <div class="row">
+          <q-intersection
+              v-for="(kpiColumn, i) in kpiColumns[tech]"
+              class="col-xs-12 col-md-6 col-lg-4 col-xl-3"
+              style="border: 1px blue solid;"
+          >
+            <e-chart-line
+                v-if="statsData[tech][kpiColumn]"
+                :key="`${tab}-${kpiColumn}-${level}-${timeUnit}-${i}}`"
+                :data="statsData[tech][kpiColumn]"
+                :kpiColumn="kpiColumn"
+                :seriesName="tech"
+                :time-unit="timeUnit"
+                :region="selectedRegion"
+                :id="i"
+            />
+            <!--              <q-card v-else>-->
+            <!--                <q-card-section>-->
+            <!--                  <div class="text-h6">No Data for {{kpiColumn}}</div>-->
+            <!--                </q-card-section>-->
+            <!--              </q-card>-->
+          </q-intersection>
+        </div>
+      </q-tab-panel>
 
 
     </q-tab-panels>

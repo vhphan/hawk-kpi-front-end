@@ -30,11 +30,6 @@ const tech = ref('nr');
     <cell-selector :tech="tech"/>
 
 
-    <!--        <div class="col q-pl-md q-pt-md" v-if="regionMetaData[tab]['time']">-->
-    <!--            <span>Data Fetched @: {{ new Date(regionMetaData[tab]['time']) }}, &nbsp</span>-->
-    <!--            <span>Region: {{ regionMetaData[tab]['region'] }}, &nbsp</span>-->
-    <!--            <span>Tech: {{ regionMetaData[tab]['tech'].toUpperCase() }}, &nbsp</span>-->
-    <!--        </div>-->
 
   </div>
 

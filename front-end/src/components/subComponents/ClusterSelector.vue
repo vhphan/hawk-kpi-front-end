@@ -56,9 +56,6 @@ const filterFn = function (val, update, abort) {
   });
 }
 
-const setModel = function(val) {
-  selectedCluster.value = val
-}
 
 onMounted(() => {
   if (!selectedCluster.value['cluster_id']) {

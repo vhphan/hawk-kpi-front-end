@@ -20,8 +20,6 @@ class MyFetch {
             baseUrl,
             options: {
                 immediate: false,
-                refetch: true,
-
                 onFetchError(ctx) {
                     // ctx.data can be null when 5xx response
                     console.log(ctx.error);

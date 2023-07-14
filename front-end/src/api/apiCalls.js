@@ -34,3 +34,4 @@ export const apiRoutes = {
 export const apiGet = (urlRef, options={}) => {
     return api().get(urlRef, options);
 }
+

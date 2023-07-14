@@ -10,6 +10,7 @@ import {generateUrl, getTimestamp} from "@/utils/myFunctions.js";
 import ClusterSelector from "@/components/subComponents/ClusterSelector.vue";
 import CellSelector from "@/components/subComponents/CellSelector.vue";
 import {triggerWarning} from "@/utils/notifications.js";
+import {apiAx} from "@/plugins/httpAx.js";
 
 const props = defineProps({
   timeUnit: {
@@ -41,19 +42,37 @@ const urlRef = computed(() =>
     mainStore.urlForPage('standard', props.level, props.timeUnit)
 );
 
-function setStoreData() {
+const getMetaData = function () {
+  const metaData = {
+    daily: {
+      region: mainStore.dailyStatsRegionMeta,
+      cluster: mainStore.dailyStatsClusterMeta,
+      cell: mainStore.dailyStatsCellMeta,
+    },
+    hourly: {
+      region: mainStore.hourlyStatsRegionMeta,
+      cluster: mainStore.hourlyStatsClusterMeta,
+      cell: mainStore.hourlyStatsCellMeta,
+    },
+  };
+  if (metaData[props.timeUnit] && metaData[props.timeUnit][props.level]) {
+    return metaData[props.timeUnit][props.level];
+  }
+  throw new Error('Invalid timeUnit or level');
+};
+
+const storeMeta = getMetaData();
+
+function setStoreData(responseData) {
   console.log('setStoreData');
   const {timeUnit, level} = props;
-  const data = dataArray.at(0).value;
-  if (!data) {
+  if (!responseData) {
     console.log('No data');
     return;
   }
-  const storeMeta = getMetaData();
-
   if (statsData && Object.keys(statsData).includes('nr') && Object.keys(statsData).includes('lte')) {
-    statsData[tab.value] = data.data;
-    storeMeta[tab.value] = data.meta;
+    statsData[tab.value] = responseData.data;
+    storeMeta[tab.value] = responseData.meta;
     updateTimeInSeconds.value = getTimestamp();
     return;
   }
@@ -79,19 +98,6 @@ function clearStoreData() {
 
 const updateTimeInSeconds = ref(getTimestamp());
 
-const {
-  isFetchingArray,
-  errorArray,
-  dataArray,
-  isLoading,
-  execute,
-} = useApiArray([apiGet(urlRef)],
-    () => {
-      console.log(`Executed for ${props.timeUnit} and ${props.level} with ${urlRef.value}`);
-      // setStoreData();
-    }
-);
-
 const kpiColumns = storeToRefs(mainStore).kpiList;
 
 const statsStoreLookup = {
@@ -116,26 +122,6 @@ const $q = useQuasar();
 
 const {regionsArray} = storeToRefs(mainStore);
 
-const getMetaData = function () {
-  const metaData = {
-    daily: {
-      region: mainStore.dailyStatsRegionMeta,
-      cluster: mainStore.dailyStatsClusterMeta,
-      cell: mainStore.dailyStatsCellMeta,
-    },
-    hourly: {
-      region: mainStore.hourlyStatsRegionMeta,
-      cluster: mainStore.hourlyStatsClusterMeta,
-      cell: mainStore.hourlyStatsCellMeta,
-    },
-  };
-  if (metaData[props.timeUnit] && metaData[props.timeUnit][props.level]) {
-    return metaData[props.timeUnit][props.level];
-  }
-  throw new Error('Invalid timeUnit or level');
-};
-
-const metaData = getMetaData();
 
 onMounted(() => {
   console.log('onMounted');
@@ -145,18 +131,33 @@ onUpdated(() => {
   console.log('onUpdated');
 });
 
+const myFetch = apiAx();
+const isLoading = ref(false);
+const fetchData = async function () {
+  console.log('fetchData');
+  isLoading.value = true;
+  const response = await myFetch.get(urlRef.value);
+  isLoading.value = false;
+  const {timeUnit, level} = props;
+  if (response.status === 200) {
+    setStoreData(response.data);
+    return;
+  }
+  clearStoreData();
+};
+
 watch(isLoading, (newValue, oldValue) => {
+  console.log('isLoading changed');
   if (isLoading.value) {
     $q.loading.show({});
     return;
   }
   $q.loading.hide();
+});
 
-  if (urlRef.value.includes('null') || urlRef.value.includes('undefined')) {
-    clearStoreData();
-    return;
-  }
-  setStoreData();
+watch(urlRef, (newValue, oldValue) => {
+  console.log('urlRef changed');
+  fetchData();
 });
 
 </script>
@@ -181,10 +182,17 @@ watch(isLoading, (newValue, oldValue) => {
         class="col-xs-12 col-md-6 col-lg-4 col-xl-3 q-mb-md"
         outlined
     />
-    <div class="col q-pl-md q-pt-md" v-if="metaData[tab] && metaData[tab]['time']">
-      <span>Data Fetched @: {{ new Date(metaData[tab]['time']) }}, &nbsp</span>
-      <span>Region: {{ metaData[tab]['region'] }}, &nbsp</span>
-      <span>Tech: {{ metaData[tab]['tech'].toUpperCase() }}, &nbsp</span>
+    <div class="col q-pl-md q-pt-md" v-if="storeMeta[tab] && storeMeta[tab]['time']">
+      <span>Data Fetched @: {{ new Date(storeMeta[tab]['time']) }}, &nbsp</span>
+
+      <span>Tech: {{ storeMeta[tab]['tech'].toUpperCase() }}, &nbsp</span>
+
+      <span v-if="storeMeta[tab]['region'] && level==='region'">Region: {{ storeMeta[tab]['region'] }}, &nbsp</span>
+
+      <span v-if="storeMeta[tab]['cell'] && level==='cell'">
+        {{ storeMeta[tab]['cell'] }}, &nbsp
+      </span>
+
     </div>
   </div>
   <q-card>
@@ -216,8 +224,8 @@ watch(isLoading, (newValue, oldValue) => {
               style="border: 1px blue solid;"
           >
             <e-chart-line
-                v-if="statsData[tech][kpiColumn]"
-                :key="`${tab}-${kpiColumn}-${level}-${timeUnit}-${i}}`"
+                v-if="statsData[tech][kpiColumn] && !isLoading"
+
                 :data="statsData[tech][kpiColumn]"
                 :kpiColumn="kpiColumn"
                 :seriesName="tech"

@@ -103,17 +103,6 @@ const toggleRightDrawer = function () {
 
       >
         <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
-          <!--                    <q-tabs-->
-          <!--                            vertical-->
-          <!--                            inline-label-->
-          <!--                            shrink-->
-          <!--                            stretch-->
-          <!--                            align="left"-->
-          <!--                    >-->
-          <!--                        <q-route-tab :to="`${basePath}RegionStatsDailyPage`" label="Page One" icon="inbox"/>-->
-          <!--                        <q-route-tab :to="`${basePath}RegionStatsHourlyPage`" label="Page Two" icon="star"/>-->
-          <!--                    </q-tabs>-->
-
           <q-list padding
           >
             <q-expansion-item
@@ -132,13 +121,10 @@ const toggleRightDrawer = function () {
                 <q-item
                     v-if="category.label === item.category"
                     clickable v-ripple :to=item.to
-
                 >
-
                   <q-item-section avatar>
                     <q-icon :name="item.icon"/>
                   </q-item-section>
-
                   <q-item-section :class="{active: item.routeName===routeName}">
                     {{ item.label }}
                   </q-item-section>

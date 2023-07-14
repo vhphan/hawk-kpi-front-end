@@ -4,7 +4,7 @@ import {useMainStore} from "@/store/mainStore.js";
 import {storeToRefs} from "pinia";
 import {apiGet} from "@/api/apiCalls.js";
 import {debounce} from "quasar";
-import {triggerInfo} from "@/utils/notifications.js";
+import {triggerInfo, triggerWarning} from "@/utils/notifications.js";
 
 const mainStore = useMainStore();
 const emit = defineEmits(['newVal']);
@@ -40,6 +40,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  validator: {
+    type: Function,
+    default: () => true,
+  },
 
 });
 
@@ -73,12 +77,21 @@ const filterFn = debounce(async function (val, update, abort) {
   console.log(elementsList.value);
 
   update(async () => {
+
     if (props.minNumberOfChars && props.minNumberOfChars > 0 && val.length < props.minNumberOfChars) {
-      if (elementPartial.value.length){
+      if (elementPartial.value.length) {
         triggerInfo({
           message: `Current list filtered for prefix ${elementPartial.value}`,
-        })
+        });
       }
+      return;
+    }
+    if (!props.validator(val)) {
+      triggerWarning({
+        message: `Invalid value ${val}`,
+        timeout: 5000,
+        position: 'center',
+      });
       return;
     }
     elementPartial.value = val;

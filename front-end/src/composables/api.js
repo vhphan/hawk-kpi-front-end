@@ -11,6 +11,7 @@ export const useApiArray = (apiArray, executeCallback = null) => {
         return isFetchingArray.some((isFetching) => isFetching.value);
     });
     const execute = async () => {
+        console.log('custom execute');
         const executePromisesArray = apiArray.map((api) => {
 
             try {
@@ -21,7 +22,7 @@ export const useApiArray = (apiArray, executeCallback = null) => {
             }
 
         });
-        await Promise.allSettled(executePromisesArray);
+        await Promise.all(executePromisesArray);
         errorArray.forEach((error) => {
             console.log(error);
             if (error.value === null) return;

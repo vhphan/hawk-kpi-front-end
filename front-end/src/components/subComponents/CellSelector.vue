@@ -17,14 +17,31 @@ const props = defineProps({
   },
 });
 
-  const newValueReceived = (v) => {
-    console.log('new value received', v);
-    selectedCell.value[props.tech] = v;
-  };
+const newValueReceived = (v) => {
+  console.log('new value received', v);
+  selectedCell.value[props.tech] = v;
+};
 
-  const selectedCellVal = computed(() => {
-    return selectedCell.value[props.tech];
-  });
+const selectedCellVal = computed(() => {
+  return selectedCell.value[props.tech];
+});
+
+const {siteIdPrefixList, selectedRegion} = storeToRefs(mainStore);
+const validatorFunc = (v) => {
+  if (siteIdPrefixList.value.length === 0) {
+    return true;
+  }
+  let validList;
+  if (selectedRegion.value === 'ALL') {
+    validList = siteIdPrefixList.value;
+  } else {
+    validList = siteIdPrefixList.value.filter((item) => item.region === selectedRegion.value);
+  }
+  if (validList.length === 0) {
+    return true;
+  }
+  return validList.map((item) => item.siteId).includes(v.slice(0, 5));
+};
 
 </script>
 
@@ -38,5 +55,6 @@ const props = defineProps({
       :minNumberOfChars="5"
       @new-val="newValueReceived"
       :initialVal="selectedCellVal"
+      :validator="validatorFunc"
   />
 </template>

@@ -2,6 +2,7 @@ import {defineStore} from 'pinia';
 import {useLocalStorage} from "@vueuse/core";
 import {apiRoutes} from "@/api/apiCalls.js";
 import {generateUrl} from "@/utils/myFunctions.js";
+import {apiAx} from "@/plugins/httpAx.js";
 
 export const useMainStore = defineStore({
     id: 'mainStore',
@@ -192,8 +193,9 @@ export const useMainStore = defineStore({
 
         selectedTech: useLocalStorage('selectedTech', 'nr'),
 
-        kpiList: useLocalStorage('kpiList', {}),
-        kpiListFlex: useLocalStorage('kpiListFlex', {}),
+        kpiList: useLocalStorage('kpiList', []),
+        kpiListFlex: useLocalStorage('kpiListFlex', []),
+        siteIdPrefixList: useLocalStorage('siteIdPrefixList', []),
 
     }),
     actions: {
@@ -202,6 +204,13 @@ export const useMainStore = defineStore({
         },
         saveHourlyStatsRegion(data, tech) {
             this.hourlyStatsRegion[tech] = data;
+        },
+        async getSiteIdPrefixList() {
+            try {
+                this.siteIdPrefixList = (await apiAx().get(apiRoutes.siteIdPrefixList)).data.data;
+            } catch (e) {
+                console.log(e);
+            }
         }
     },
     getters: {
@@ -227,7 +236,7 @@ export const useMainStore = defineStore({
                 nr: [
                     ...Object.keys(dailyStatsRegionFlex.nr),
                     ...Object.keys(dailyStatsClusterFlex.nr),
-                ]                ,
+                ],
                 lte: [
                     ...Object.keys(dailyStatsRegionFlex.lte),
                     ...Object.keys(dailyStatsClusterFlex.lte),
@@ -275,7 +284,7 @@ export const useMainStore = defineStore({
             const {selectedCluster} = state;
             return selectedCluster.cluster_id;
         },
-        urlForPage: (state)  => (kpiType, level, timeUnit) => {
+        urlForPage: (state) => (kpiType, level, timeUnit) => {
             const {selectedRegion, selectedCluster, selectedTech, selectedCell, selectedClusterId} = state;
             const clusterId = selectedCluster.cluster_id;
 
@@ -327,7 +336,21 @@ export const useMainStore = defineStore({
         urlForDailyStatsRegion: (state) => {
             const {urlForPage} = state;
             return urlForPage('standard', 'region', 'daily');
-        }
+        },
+        // isSelectedCellInSelectedRegion: (state) => {
+        //     const {selectedCell, selectedRegion, siteIdPrefixList} = state;
+        //     const sitePrefixes = siteIdPrefixList.filter(prefix => prefix.region === selectedRegion);
+        //     if (sitePrefixes.length === 0) {
+        //         return {
+        //             nr: false,
+        //             lte: false,
+        //         };
+        //     }
+        //     return {
+        //         nr: sitePrefixes.some(prefix => selectedCell.nr.startsWith(prefix.siteId)),
+        //         lte: sitePrefixes.some(prefix => selectedCell.lte.startsWith(prefix.siteId)),
+        //     };
+        // }
 
     }
 });
